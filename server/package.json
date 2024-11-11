@@ -7,8 +7,8 @@
     "start": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Kellie Carlson <carlson.kellie.27@gmail.com>",
-  "license": "MIT",
+  "author": "Phillip, Evan, Nikhita, Nandini",
+  "license": "",
   "dependencies": {
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
