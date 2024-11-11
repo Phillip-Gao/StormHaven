@@ -5,28 +5,26 @@ export default function PageNavbar(props) {
 	const [navDivs, setNavDivs] = useState([]);
 
 	useEffect(() => {
-		const pageList = ['Dashboard', 'FindHouses'];
+		const pageList = ['Dashboard', 'FindHouses', 'PropertySearch', 'DisasterRisks'];
 
 		let navbarDivs = pageList.map((page, i) => {
 			if (props.active === page) {
 				return (
 					<a className="nav-item nav-link active" key={i} href={"/" + page}>
-						{page.charAt(0).toUpperCase() + page.substring(1, page.length)}
+						{page.charAt(0).toUpperCase() + page.substring(1)}
 					</a>
 				)
 			} else {
 				return (
 					<a className="nav-item nav-link" key={i} href={"/" + page}>
-						{page.charAt(0).toUpperCase() + page.substring(1, page.length)}
+						{page.charAt(0).toUpperCase() + page.substring(1)}
 					</a>
 				)
 			}
-		})
+		});
 
 		setNavDivs(navbarDivs);
-
-	}, [])
-
+	}, []);
 
 	return (
 		<div className="PageNavbar">
@@ -40,5 +38,4 @@ export default function PageNavbar(props) {
 			</nav>
 		</div>
 	);
-
 }
