@@ -12,6 +12,6 @@ Dashboard.js: Displays an overview of relevant disaster and housing information.
 
 DisasterRisks.js: Displays a list of disaster events and affected properties. Users can search based on disaster type, date, and location.
 
-PropertySearch.js: Alows users to filter properties based on criteria such as location, price, number of bedrooms/bathrooms, and disaster type.
+FindHouses.js: Alows users to filter properties based on criteria such as location, price, number of bedrooms/bathrooms, and disaster type.
 
 PageNavbar.js: Reusable navigation bar used across different pages. Renders navigation links for each page and highlights the active page.
