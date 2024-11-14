@@ -6,7 +6,7 @@ Homebuyers face difficult choices when deciding where to purchase property, espe
 
 ## Directories
 
-App.js: Sets up the routing for the app, defining which components should be displayed for each URL path. It imports Dashboard, FindHouses, PropertySearch, and DisasterRisks and uses React Router to handle navigation between these pages.
+App.js: Sets up the routing for the app, defining which components should be displayed for each URL path. It imports Dashboard, FindHouses, FindHouses, and DisasterRisks and uses React Router to handle navigation between these pages.
 
 Dashboard.js: Displays an overview of relevant disaster and housing information. 
 
