@@ -21,8 +21,8 @@ export default function FindHouses(props) {
 				let housesDivs = housesList.map((house, i) =>
 					/* ---- Part 2 (FindHouses) ---- */
 					<div key={i} className="houseResults">
-						<div className="login">{house.house}</div>
-						<div className="name">{house.name}</div>
+						<div className="address">{house.address}</div>
+						<div className="price">{house.price}</div>
 					</div>
 				);
 
@@ -44,7 +44,7 @@ export default function FindHouses(props) {
 					<div className="h5">Find House</div>
 
 					<div className="input-container">
-						<input type='text' placeholder="awest@gmail.com" value={login} onChange={e => setLogin(e.target.value)} id="movieName" className="login-input" />
+						<input type='text' placeholder="search" value={login} onChange={e => setLogin(e.target.value)} id="movieName" className="login-input" />
 						{/* ---- Part 2 (FindHouses) ---- */}
 						<button id="submitMovieBtn" className="submit-btn" onClick={submitLogin}>Submit</button>
 
@@ -52,8 +52,8 @@ export default function FindHouses(props) {
 
 					<div className="header-container">
 						<div className="headers">
-							<div className="header"><strong>Login</strong></div>
-							<div className="header"><strong>Name</strong></div>
+							<div className="header"><strong>Address</strong></div>
+							<div className="header"><strong>Price</strong></div>
 						</div>
 					</div>
 
