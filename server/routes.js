@@ -100,9 +100,8 @@ function getSafestPropertiesInHighRiskAreas(req, res) {
   });
 }
 
-// Query 4: Retrieve properties that have been impacted by fewer disasters than the 
-// average number of disasters per property in their location, showing property_id, city, and state.
-function getSafestPropertiesInHighRiskAreas(req, res) {
+// Query 4: Retrieve properties that have been affected by all disaster types in their respective city and state.
+function getPropertiesWithAllDisasters(req, res) {
   var query = `
     WITH Disaster_Types_Per_Location AS (
       SELECT l.city, l.state, dt.type_code
@@ -132,7 +131,6 @@ function getSafestPropertiesInHighRiskAreas(req, res) {
     FROM Property p
     JOIN Located l ON p.property_id = l.property_id
     WHERE p.property_id IN (SELECT property_id FROM All_Disaster_Types_Check);
-    );
   `;
   connection.query(query, function(err, rows, fields) {
     if (err) console.log(err);
@@ -302,6 +300,10 @@ function getMostRecentDisastersByState(req, res) {
 
 // Export the new functions to be accessible in index.js
 module.exports = {
+  getFrequentDisasterHighPriceProperties: getFrequentDisasterHighPriceProperties,
+  getRecentlyUnimpactedHighRiskAreas: getRecentlyUnimpactedHighRiskAreas,
+  getSafestPropertiesInHighRiskAreas: getSafestPropertiesInHighRiskAreas,
+  getPropertiesWithAllDisasters: getPropertiesWithAllDisasters,
   getTopAffectedAreas: getTopAffectedAreas,
   getMostAffectedProperties: getMostAffectedProperties,
   getFrequentDisasterProperties: getFrequentDisasterProperties,
