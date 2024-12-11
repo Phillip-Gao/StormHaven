@@ -3,7 +3,7 @@
   "port": "5432",
   "user" : "stormhaven_proj",
   "password": "PhillipEvanNikkiNandini123",
-  "database": "postgres",
+  "database": "stormhaven",
   "server_host": "localhost",
   "server_port": "8080"
 }

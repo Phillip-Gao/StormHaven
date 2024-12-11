@@ -311,7 +311,7 @@ function getMostRecentDisastersByState(req, res) {
 
 
 // Route 1: GET /properties
-function search_properties(req, res) {
+const search_properties = async function (req, res) {
   // TODO (TASK 12): return all songs that match the given search query with parameters defaulted to those specified in API spec ordered by title (ascending)
   // Some default parameters have been provided for you, but you will need to fill in the rest
   const city = req.query.city;
@@ -329,13 +329,14 @@ function search_properties(req, res) {
 
   connection.query(`
     SELECT * 
-    FROM property p 
-    JOIN features f ON p.property_id = f.property_id
+    FROM public.Property p 
+    JOIN public.features f ON p.property_id = f.property_id
     WHERE price BETWEEN ${priceLow} AND ${priceHigh}
       AND bathrooms BETWEEN ${bathroomsLow} AND ${bathroomsHigh}
       AND bedrooms BETWEEN ${bedroomsLow} AND ${bedroomsHigh}
       AND acre_lot BETWEEN ${acresLow} AND ${acresHigh}
     ORDER BY p.property_id ASC
+    LIMIT 100;
   `, (err, data) => {
     if (err) {
       console.log(err);
