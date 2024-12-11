@@ -1,8 +1,19 @@
-var config = require('./db-config.js');
+const config = require('./config.json')
 var mysql = require('mysql');
+const { Pool, types } = require('pg');
 
-config.connectionLimit = 10;
-var connection = mysql.createPool(config);
+types.setTypeParser(20, val => parseInt(val, 10)); //DO NOT DELETE THIS
+const connection = new Pool({
+  host: config.host,
+  user: config.user,
+  password: config.password,
+  port: config.port,
+  database: config.database,
+  ssl: {
+    rejectUnauthorized: false,
+  },
+});
+connection.connect((err) => err && console.log(err));
 
 /* -------------------------------------------------- */
 /* ------------------- Route Handlers --------------- */
@@ -197,8 +208,8 @@ function getFrequentDisasterProperties(req, res) {
 function getSafeLargeProperties(req, res) {
   var query = `
     SELECT p.property_id, p.price, f.bedrooms, f.bathrooms, f.acre_lot
-    FROM Property p
-    INNER JOIN Features f ON p.property_id = f.property_id
+    FROM property p
+    INNER JOIN features f ON p.property_id = f.property_id
     WHERE f.bedrooms >= 3
       AND f.bathrooms >= 2
       AND p.property_id NOT IN (
@@ -217,8 +228,8 @@ function getSafeLargeProperties(req, res) {
 function getDisasterTrends(req, res) {
   var query = `
     SELECT YEAR(d.designated_date) AS year, dt.type_description, COUNT(d.disaster_id) AS disaster_count 
-    FROM Disaster d 
-    JOIN Disaster_Types dt ON d.disaster_id = dt.disaster_id 
+    FROM disaster d 
+    JOIN disaster_types dt ON d.disaster_id = dt.disaster_id 
     GROUP BY year, dt.type_description 
     ORDER BY year DESC, disaster_count DESC;
   `;
@@ -232,8 +243,8 @@ function getDisasterTrends(req, res) {
 function getLargeProperties(req, res) {
   var query = `
     SELECT p.property_id, f.bedrooms, f.bathrooms 
-    FROM Property p 
-    JOIN Features f ON p.property_id = f.property_id 
+    FROM property p 
+    JOIN features f ON p.property_id = f.property_id 
     WHERE f.bedrooms >= 3 AND f.bathrooms >= 2;
   `;
   connection.query(query, function(err, rows, fields) {
@@ -274,8 +285,8 @@ function getAveragePriceInDisasterAreas(req, res) {
 function getRecentDisasters(req, res) {
   var query = `
     SELECT d.disaster_id, d.designated_date, dt.type_description 
-    FROM Disaster d 
-    JOIN Disaster_Types dt ON d.disaster_id = dt.disaster_id 
+    FROM disaster d 
+    JOIN disaster_Types dt ON d.disaster_id = dt.disaster_id 
     WHERE d.designated_date >= DATE_SUB(CURDATE(), INTERVAL 5 YEAR);
   `;
   connection.query(query, function(err, rows, fields) {
@@ -298,20 +309,60 @@ function getMostRecentDisastersByState(req, res) {
   });
 }
 
+
+// Route 1: GET /properties
+function search_properties(req, res) {
+  // TODO (TASK 12): return all songs that match the given search query with parameters defaulted to those specified in API spec ordered by title (ascending)
+  // Some default parameters have been provided for you, but you will need to fill in the rest
+  const city = req.query.city;
+  const state = req.query.state;
+  const priceLow = req.query.price_low ?? 0;
+  const priceHigh = req.query.price_high ?? 10000000000;
+  const bathroomsLow = req.query.bathrooms_low ?? 0;
+  const bathroomsHigh = req.query.bathrooms_high ?? 100;
+  const bedroomsLow = req.query.bedrooms_low ?? 0;
+  const bedroomsHigh = req.query.bedrooms_high ?? 1000;
+  const acresLow = req.query.acresLow ?? 0;
+  const acresHigh = req.query.acresHigh ?? 10000;
+  const cityFilter = city ? `city LIKE '%${city}%'` : 'TRUE';
+  const stateFilter = state ? `state LIKE '%${state}%'` : 'TRUE';
+
+  connection.query(`
+    SELECT * 
+    FROM property p 
+    JOIN features f ON p.property_id = f.property_id
+    WHERE price BETWEEN ${priceLow} AND ${priceHigh}
+      AND bathrooms BETWEEN ${bathroomsLow} AND ${bathroomsHigh}
+      AND bedrooms BETWEEN ${bedroomsLow} AND ${bedroomsHigh}
+      AND acre_lot BETWEEN ${acresLow} AND ${acresHigh}
+    ORDER BY p.property_id ASC
+  `, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.json([]);
+    } else {
+      console.log("success")
+      res.json(data.rows);
+    }
+  });
+}
+
+
 // Export the new functions to be accessible in index.js
 module.exports = {
-  getFrequentDisasterHighPriceProperties: getFrequentDisasterHighPriceProperties,
-  getRecentlyUnimpactedHighRiskAreas: getRecentlyUnimpactedHighRiskAreas,
-  getSafestPropertiesInHighRiskAreas: getSafestPropertiesInHighRiskAreas,
-  getPropertiesWithAllDisasters: getPropertiesWithAllDisasters,
-  getTopAffectedAreas: getTopAffectedAreas,
-  getMostAffectedProperties: getMostAffectedProperties,
-  getFrequentDisasterProperties: getFrequentDisasterProperties,
-  getSafeLargeProperties: getSafeLargeProperties,
-  getDisasterTrends: getDisasterTrends,
-  getLargeProperties: getLargeProperties,
-  getCaliforniaDisasters: getCaliforniaDisasters,
-  getAveragePriceInDisasterAreas: getAveragePriceInDisasterAreas,
-  getRecentDisasters: getRecentDisasters,
-  getMostRecentDisastersByState: getMostRecentDisastersByState
+  getFrequentDisasterHighPriceProperties,
+  getRecentlyUnimpactedHighRiskAreas,
+  getSafestPropertiesInHighRiskAreas,
+  getPropertiesWithAllDisasters,
+  getTopAffectedAreas,
+  getMostAffectedProperties,
+  getFrequentDisasterProperties,
+  getSafeLargeProperties,
+  getDisasterTrends,
+  getLargeProperties,
+  getCaliforniaDisasters,
+  getAveragePriceInDisasterAreas,
+  getRecentDisasters,
+  getMostRecentDisastersByState,
+  search_properties
 };
