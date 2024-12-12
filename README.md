@@ -41,7 +41,7 @@ Need to install @mui/material @emotion/react @emotion/styled:
 
 Then install @mui/x-data-grid
     
-    npm install @mui/x-data-grid
+    npm install @mui/x-data-grid --legacy-peer-deps
 
 Finally, start the client:
 
