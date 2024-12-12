@@ -18,10 +18,22 @@ PageNavbar.js: Reusable navigation bar used across different pages. Renders navi
 
 ## Instructions
 
-First run:
+The node modules required for the client and the server are currently not downloaded (files are too large to be stored on GitHub). To ensure they work, we must go through the following process:
 
-    npm install react
-    npm install react-dom
+# Client
+
+First, open up a new terminal in the VSCode project. Then run the following to navigate into the client:
+
+    cd client
+
+We then run the following (you will notice that you will get errors, which we will resolve in the following steps):
+
+    npm install 
+
+Next, run the following commands:
+    
+    npm install react --legacy-peer-deps
+    npm install react-dom --legacy-peer-deps
 
 Need to install @mui/material @emotion/react @emotion/styled:
 
@@ -30,3 +42,21 @@ Need to install @mui/material @emotion/react @emotion/styled:
 Then install @mui/x-data-grid
     
     npm install @mui/x-data-grid
+
+Finally, start the client:
+
+    npm start
+
+# Server
+
+Next, open up a separate terminal in the VSCode project. Then run the following to navigate into the server:
+
+    cd server
+
+We then run the following (there should be no errors):
+
+    npm install
+
+Finally, start the server:
+
+    npm start
