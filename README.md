@@ -15,3 +15,20 @@ DisasterRisks.js: Displays a list of disaster events and affected properties. Us
 FindHouses.js: Alows users to filter properties based on criteria such as location, price, number of bedrooms/bathrooms, and disaster type.
 
 PageNavbar.js: Reusable navigation bar used across different pages. Renders navigation links for each page and highlights the active page.
+
+## Instructions
+
+IN CLIENT:
+
+First run:
+
+    npm install react
+    npm install react-dom
+
+Need to install @mui/material @emotion/react @emotion/styled:
+
+    npm install @mui/material @emotion/react @emotion/styled --legacy-peer-deps
+
+Then install @mui/x-data-grid
+    
+    npm install @mui/x-data-grid
