@@ -30,11 +30,6 @@ We then run the following (you will notice that you will get errors, which we wi
 
     npm install 
 
-Next, run the following commands:
-    
-    npm install react --legacy-peer-deps
-    npm install react-dom --legacy-peer-deps
-
 Need to install @mui/material @emotion/react @emotion/styled:
 
     npm install @mui/material @emotion/react @emotion/styled --legacy-peer-deps
