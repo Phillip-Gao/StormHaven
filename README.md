@@ -29,6 +29,6 @@ Need to install @mui/material @emotion/react @emotion/styled:
 
     npm install @mui/material @emotion/react @emotion/styled --legacy-peer-deps
 
-Then install @mui/x-data-grid
+Then install @mui/x-data-grid:
     
     npm install @mui/x-data-grid
