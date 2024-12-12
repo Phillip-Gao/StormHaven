@@ -20,7 +20,7 @@ PageNavbar.js: Reusable navigation bar used across different pages. Renders navi
 
 The node modules required for the client and the server are currently not downloaded (files are too large to be stored on GitHub). To ensure they work, we must go through the following process:
 
-# Client
+### Client
 
 First, open up a new terminal in the VSCode project. Then run the following to navigate into the client:
 
@@ -47,7 +47,7 @@ Finally, start the client:
 
     npm start
 
-# Server
+### Server
 
 Next, open up a separate terminal in the VSCode project. Then run the following to navigate into the server:
 
