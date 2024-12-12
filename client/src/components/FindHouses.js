@@ -1,68 +1,154 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Button, Container, Grid, Slider, TextField, Link, Box } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
 import PageNavbar from './PageNavbar';
-import '../style/FindHouses.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import config from './config.json';
 
-export default function FindHouses(props) {
+export default function FindHouses() {
+  const [pageSize, setPageSize] = useState(10);
+  const [data, setData] = useState([]);
+ 
+  const [propertyId, setPropertyId] = useState(null);
+  const [countyName, setCountyName] = useState(null);
+  const [state, setState] = useState(null); 
+  const [status, setStatus] = useState(null);
+  const [price, setPrice] = useState([0, 5000000]);
+  const [bathrooms, setBathrooms] = useState([0, 10]);
+  const [bedrooms, setBedrooms] = useState([0, 20]);
+  const [acres, setAcres] = useState([0, 5]);
 
-	// State maintained by this React component is the inputted login,
-	// and the list of houses
-	const [login, setLogin] = useState("");
-	const [foundHouses, setFoundHouses] = useState([]);
+  useEffect(() => {
+    fetch(`http://${config.server_host}:${config.server_port}/search_properties`)
+      .then(res => res.json())
+      .then(resJson => {
+        const propertiesWithId = resJson.map(property => ({ id: property.property_id, ...property }));
+        setData(propertiesWithId);
+      });
+  }, []);
 
-	const submitLogin = async (e) => {
-		/* ---- Part 2 (FindHouses) ---- */
-		fetch(`http://localhost:8081/houses/${login}`, {
-			method: "GET"
-		})
-			.then(res => res.json())
-			.then(housesList => {
-				console.log(housesList); //displays your JSON object in the console
-				let housesDivs = housesList.map((house, i) =>
-					/* ---- Part 2 (FindHouses) ---- */
-					<div key={i} className="houseResults">
-						<div className="address">{house.address}</div>
-						<div className="price">{house.price}</div>
-					</div>
-				);
+  const search = () => {
+    const query = `http://${config.server_host}:${config.server_port}/search_properties?` +
+      `property_id=${propertyId}&county_name=${countyName}&state=${state}&status=${status}` +
+      `&price_low=${price[0]}&price_high=${price[1]}` +
+      `&bathrooms_low=${bathrooms[0]}&bathrooms_high=${bathrooms[1]}` +
+      `&bedrooms_low=${bedrooms[0]}&bedrooms_high=${bedrooms[1]}` +
+      `&acres_low=${acres[0]}&acres_high=${acres[1]}`;
 
-				setFoundHouses(housesDivs);
+    fetch(query)
+      .then(res => res.json())
+      .then(resJson => {
+        const propertiesWithId = resJson.map(property => ({ id: property.property_id, ...property }));
+        setData(propertiesWithId);
+      });
+  }
 
-			})
-			.catch(err => console.log(err));
-	}
+  const resetFilters = () => {
+    setPropertyId('');
+    setCountyName('');
+    setState('');
+    setStatus('');
+    setPrice([0, 5000000]);
+    setBathrooms([0, 10]);
+    setBedrooms([0, 20]);
+    setAcres([0, 5]);
+  }
 
+  const columns = [
+    { field: 'property_id', headerName: 'Property ID', width: 150 },
+    { field: 'county_name', headerName: 'City', width: 150 },
+	{ field: 'state', headerName: "State", width: 150 },
+    { field: 'price', headerName: 'Price', width: 150 },
+    { field: 'bathrooms', headerName: 'Bathrooms' },
+    { field: 'bedrooms', headerName: 'Bedrooms' },
+    { field: 'acre_lot', headerName: 'Acres' },
+    { field: 'status', headerName: 'Status' }
+  ];
 
-	return (
-		<div className="Recommendations">
-			<PageNavbar active="FindHouses" />
-
-			<div className="container recommendations-container">
-				<br></br>
-				<div className="jumbotron findHouse-headspace">
-
-					<div className="h5">Find House</div>
-
-					<div className="input-container">
-						<input type='text' placeholder="search" value={login} onChange={e => setLogin(e.target.value)} id="movieName" className="login-input" />
-						{/* ---- Part 2 (FindHouses) ---- */}
-						<button id="submitMovieBtn" className="submit-btn" onClick={submitLogin}>Submit</button>
-
-					</div>
-
-					<div className="header-container">
-						<div className="headers">
-							<div className="header"><strong>Address</strong></div>
-							<div className="header"><strong>Price</strong></div>
-						</div>
-					</div>
-
-					<div className="results-container" id="results">
-						{foundHouses}
-					</div>
-
-				</div>
-			</div>
-		</div>
-	);
+  return (
+    <Container>
+      <PageNavbar active='Dashboard' />
+      <h2>Search Properties</h2>
+      <Grid container spacing={2}>
+	 	<Grid item xs={12} sm={6}>
+          <TextField label='Property ID' value={propertyId} onChange={(e) => setPropertyId(e.target.value)} fullWidth />
+        </Grid>
+		<Grid item xs={12} sm={6}>
+          <Box display="flex" justifyContent="space-between">
+            <Button variant="outlined" onClick={search} sx={{ flex: 1, marginX: 0.5, marginY: 2}}>
+              Search
+            </Button>
+            <Button variant="outlined" onClick={resetFilters} sx={{ flex: 1, marginX: 0.5, marginY: 2}}>
+              Reset Filters
+            </Button>
+          </Box>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField label='City' value={countyName} onChange={(e) => setCountyName(e.target.value)} fullWidth />
+        </Grid>
+		<Grid item xs={12} sm={6}>
+          <TextField label='State' value={state} onChange={(e) => setState(e.target.value)} fullWidth />
+        </Grid>
+		<Grid item xs={12}>
+          <Box display="flex" justifyContent="space-between">
+            <Button variant={status === 'for_sale' ? "contained" : "outlined"} onClick={() => setStatus('for_sale')} sx={{ flex: 1, marginX: 0.5 }}>For Sale</Button>
+            <Button variant={status === 'ready_to_build' ? "contained" : "outlined"} onClick={() => setStatus('ready_to_build')} sx={{ flex: 1, marginX: 0.5 }}>Ready to Build</Button>
+            <Button variant={status === 'sold' ? "contained" : "outlined"} onClick={() => setStatus('sold')} sx={{ flex: 1, marginX: 0.5 }}>Sold</Button>
+          </Box>
+        </Grid>
+        <Grid item xs={12}>
+          <p>Price</p>
+          <Slider
+            value={price}
+            min={0}
+            max={5000000}
+            step={50000}
+            onChange={(e, newValue) => setPrice(newValue)}
+            valueLabelDisplay='auto'
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <p>Bathrooms</p>
+          <Slider
+            value={bathrooms}
+            min={0}
+            max={10}
+            step={1}
+            onChange={(e, newValue) => setBathrooms(newValue)}
+            valueLabelDisplay='auto'
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <p>Bedrooms</p>
+          <Slider
+            value={bedrooms}
+            min={0}
+            max={20}
+            step={1}
+            onChange={(e, newValue) => setBedrooms(newValue)}
+            valueLabelDisplay='auto'
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <p>Acres</p>
+          <Slider
+            value={acres}
+            min={0}
+            max={5}
+            step={0.2}
+            onChange={(e, newValue) => setAcres(newValue)}
+            valueLabelDisplay='auto'
+          />
+        </Grid>
+      </Grid>
+      <h2>Results</h2>
+      <DataGrid
+        rows={data}
+        columns={columns}
+        pageSize={pageSize}
+        rowsPerPageOptions={[5, 10, 25]}
+        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+        autoHeight
+      />
+    </Container>
+  );
 }
