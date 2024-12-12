@@ -10,7 +10,7 @@ app.use(cors({
 }));
 
 app.get('/', (req, res) => {
-  res.redirect('/search_properties');
+  res.redirect('/search_disasters');
 });
 
 // app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
@@ -23,52 +23,53 @@ app.get('/', (req, res) => {
 
 /* ---- (Dashboard) ---- */
 
-// Query 1: Find the most frequent disaster types in locations where the average property price exceeds $500,000
+// // Query 1: Find the most frequent disaster types in locations where the average property price exceeds $500,000
 // app.get('/frequent-disaster-high-price-properties', routes.getFrequentDisasterHighPriceProperties);
 
-// Query 2: List properties with no disasters in the past 5 years in high-risk disaster areas
+// // Query 2: List properties with no disasters in the past 5 years in high-risk disaster areas
 // app.get('/recently-unimpacted-high-risk-areas', routes.getRecentlyUnimpactedHighRiskAreas);
 
-// Query 3: Retrieve properties with fewer disasters than the average in their location
+// // Query 3: Retrieve properties with fewer disasters than the average in their location
 // app.get('/safest-properties-in-high-risk-areas', routes.getSafestPropertiesInHighRiskAreas);
 
-// Query 4: Retrieve properties affected by all disaster types in their area
+// // Query 4: Retrieve properties affected by all disaster types in their area
 // app.get('/properties-with-all-disasters', routes.getPropertiesWithAllDisasters);
 
-// Query 5: Lists areas with the highest number of properties affected by disasters
+// // Query 5: Lists areas with the highest number of properties affected by disasters
 // app.get('/top-affected-areas', routes.getTopAffectedAreas);
 
-// Query 6: Identifies properties affected by the highest number of disaster events
+// // Query 6: Identifies properties affected by the highest number of disaster events
 // app.get('/most-affected-properties', routes.getMostAffectedProperties);
 
-// Query 7: Finds properties in frequent disaster areas and under a price threshold
+// // Query 7: Finds properties in frequent disaster areas and under a price threshold
 // app.get('/frequent-disaster-properties', routes.getFrequentDisasterProperties);
 
-// Query 8: Retrieves properties with 3+ bedrooms, 2+ bathrooms, and no disaster history
+// // Query 8: Retrieves properties with 3+ bedrooms, 2+ bathrooms, and no disaster history
 // app.get('/safe-large-properties', routes.getSafeLargeProperties);
 
-// Query 9: Summarizes disaster counts per year by type
+// // Query 9: Summarizes disaster counts per year by type
 // app.get('/disaster-trends', routes.getDisasterTrends);
 
-// Query 10: Finds properties with minimum specified bedrooms and bathrooms
+// // Query 10: Finds properties with minimum specified bedrooms and bathrooms
 // app.get('/large-properties', routes.getLargeProperties);
 
-// Query 11: Lists disaster types occurring in California
+// // Query 11: Lists disaster types occurring in California
 // app.get('/california-disasters', routes.getCaliforniaDisasters);
 
-// Query 12: Calculates average price of properties in disaster-prone areas
+// // Query 12: Calculates average price of properties in disaster-prone areas
 // app.get('/average-price-in-disaster-areas', routes.getAveragePriceInDisasterAreas);
 
-// Query 13: Retrieves recent disasters within the last 5 years
+// // Query 13: Retrieves recent disasters within the last 5 years
 // app.get('/recent-disasters', routes.getRecentDisasters);
 
-// Query 14: Finds the most recent disaster by state
+// // Query 14: Finds the most recent disaster by state
 // app.get('/most-recent-disasters-by-state', routes.getMostRecentDisastersByState);
 
 /* ---- (FindHouses) ---- */
 app.get('/search_properties', routes.search_properties);
 
 /* ---- (DisasterRisks) ---- */
+app.get('/search_disasters', routes.search_disasters);
 
 app.listen(config.server_port, () => {
 	console.log(`Server running at http://${config.server_host}:${config.server_port}/`)

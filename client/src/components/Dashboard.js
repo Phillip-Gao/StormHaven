@@ -12,7 +12,7 @@ export default function Dashboard(props) {
 	// React function that is called when the page load.
 	useEffect(() => {
 		// Send an HTTP request to the server.
-		fetch('http://localhost:8081/house', {
+		fetch('http://localhost:8080/house', {
 			method: 'GET', // The type of HTTP request.
 		})
 			.then(res => res.json()) // Convert the response data to a JSON.

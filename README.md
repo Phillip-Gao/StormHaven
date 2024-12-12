@@ -18,15 +18,7 @@ PageNavbar.js: Reusable navigation bar used across different pages. Renders navi
 
 ## Instructions
 
-IN CLIENT AND SERVER:
-
-Run in terminal:
-
-    npm install
-
-IN CLIENT:
-
-First run in terminal:
+First run:
 
     npm install react
     npm install react-dom
@@ -35,10 +27,6 @@ Need to install @mui/material @emotion/react @emotion/styled:
 
     npm install @mui/material @emotion/react @emotion/styled --legacy-peer-deps
 
-Then install @mui/x-data-grid:
+Then install @mui/x-data-grid
     
     npm install @mui/x-data-grid
-
-Finally install:
-
-    npm install pg

@@ -311,13 +311,29 @@ function getMostRecentDisastersByState(req, res) {
 
 const search_properties = async function (req, res) {
   const propertyId = req.query.property_id;
-  const propertyIdFilter = propertyId  ? `p.property_id = ${propertyId}` : 'TRUE';
+  var propertyIdFilter  = 'TRUE';
+  if (typeof propertyId !== 'undefined' && propertyId.length != 0) {
+    propertyIdFilter = `p.property_id = ${propertyId}`;
+  }
+
   const state = req.query.state;
-  const stateFilter = state  ? `state LIKE '%${state}%'` : 'TRUE';
+  var stateFilter = 'TRUE';
+  if (typeof state !== 'undefined' && state.length != 0) {
+    stateFilter = `state LIKE '%${state}%'`;
+  }
+
   const county = req.query.county_name;
-  const countyFilter = county  ? `county_name LIKE '%${county}%'` : 'TRUE';
+  var countyFilter = 'TRUE';
+  if (typeof county !== 'undefined' && county.length != 0) {
+    countyFilter = `county_name LIKE '%${county}%'`;
+  }
+
   const status = req.query.status;
-  const statusFilter = status  ? `status LIKE '%${status}%'` : 'TRUE';
+  var statusFilter = 'TRUE';
+  if (typeof status !== 'undefined' && status.length != 0) {
+    statusFilter = `status LIKE '%${status}%'`;
+  }
+
   const priceLow = req.query.price_low ?? 0;
   const priceHigh = req.query.price_high ?? 10000000000;
   const bathroomsLow = req.query.bathrooms_low ?? 0;
@@ -341,6 +357,59 @@ const search_properties = async function (req, res) {
       AND bedrooms BETWEEN ${bedroomsLow} AND ${bedroomsHigh}
       AND acre_lot BETWEEN ${acreLotLow} AND ${acreLotHigh}
     ORDER BY p.property_id ASC
+    LIMIT 1000;
+  `, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.json([]);
+    } else {
+      console.log("Success");
+      res.json(data.rows);
+    }
+  });
+}
+
+
+const search_disasters = async function (req, res) {
+  // const propertyId = req.query.property_id;
+  // var propertyIdFilter  = 'TRUE';
+  // if (typeof propertyId !== 'undefined' && propertyId.length != 0) {
+  //   propertyIdFilter = `p.property_id = ${propertyId}`;
+  // }
+
+  // const state = req.query.state;
+  // var stateFilter = 'TRUE';
+  // if (typeof state !== 'undefined' && state.length != 0) {
+  //   stateFilter = `state LIKE '%${state}%'`;
+  // }
+
+  // const county = req.query.county_name;
+  // var countyFilter = 'TRUE';
+  // if (typeof county !== 'undefined' && county.length != 0) {
+  //   countyFilter = `county_name LIKE '%${county}%'`;
+  // }
+
+  // const status = req.query.status;
+  // var statusFilter = 'TRUE';
+  // if (typeof status !== 'undefined' && status.length != 0) {
+  //   statusFilter = `status LIKE '%${status}%'`;
+  // }
+
+  // const priceLow = req.query.price_low ?? 0;
+  // const priceHigh = req.query.price_high ?? 10000000000;
+  // const bathroomsLow = req.query.bathrooms_low ?? 0;
+  // const bathroomsHigh = req.query.bathrooms_high ?? 100;
+  // const bedroomsLow = req.query.bedrooms_low ?? 0;
+  // const bedroomsHigh = req.query.bedrooms_high ?? 1000;
+  // const acreLotLow = req.query.acres_low ?? 0;
+  // const acreLotHigh = req.query.acres_high ?? 10000;
+
+  // Adjusted SQL query to handle the new filters and join
+  connection.query(`
+    SELECT * 
+    FROM public.Disaster d
+    JOIN public.Disaster_Types dt ON d.disaster_id = dt.disaster_id
+    ORDER BY d.disasternumber ASC
     LIMIT 100;
   `, (err, data) => {
     if (err) {
@@ -352,6 +421,7 @@ const search_properties = async function (req, res) {
     }
   });
 }
+
 
 
 // Export the new functions to be accessible in index.js
@@ -370,5 +440,6 @@ module.exports = {
   getAveragePriceInDisasterAreas,
   getRecentDisasters,
   getMostRecentDisastersByState,
-  search_properties
+  search_properties,
+  search_disasters
 };

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Container, Grid, Slider, TextField, Link, Box } from '@mui/material';
+import { createTheme } from '@mui/material/styles';
 import { DataGrid } from '@mui/x-data-grid';
 import PageNavbar from './PageNavbar';
 import config from './config.json';
@@ -8,10 +9,10 @@ export default function FindHouses() {
   const [pageSize, setPageSize] = useState(10);
   const [data, setData] = useState([]);
  
-  const [propertyId, setPropertyId] = useState(null);
-  const [countyName, setCountyName] = useState(null);
-  const [state, setState] = useState(null); 
-  const [status, setStatus] = useState(null);
+  const [propertyId, setPropertyId] = useState('');
+  const [countyName, setCountyName] = useState('');
+  const [state, setState] = useState(''); 
+  const [status, setStatus] = useState('');
   const [price, setPrice] = useState([0, 5000000]);
   const [bathrooms, setBathrooms] = useState([0, 10]);
   const [bedrooms, setBedrooms] = useState([0, 20]);
@@ -66,7 +67,7 @@ export default function FindHouses() {
 
   return (
     <Container>
-      <PageNavbar active='Dashboard' />
+      <PageNavbar active='FindHouses' />
       <h2>Search Properties</h2>
       <Grid container spacing={2}>
 	 	<Grid item xs={12} sm={6}>
@@ -74,12 +75,8 @@ export default function FindHouses() {
         </Grid>
 		<Grid item xs={12} sm={6}>
           <Box display="flex" justifyContent="space-between">
-            <Button variant="outlined" onClick={search} sx={{ flex: 1, marginX: 0.5, marginY: 2}}>
-              Search
-            </Button>
-            <Button variant="outlined" onClick={resetFilters} sx={{ flex: 1, marginX: 0.5, marginY: 2}}>
-              Reset Filters
-            </Button>
+		  	<Button variant={status === 'for_sale' ? "contained" : "outlined"} onClick={() => setStatus('for_sale')} sx={{ flex: 1, marginX: 0.5 }}>For Sale</Button>
+            <Button variant={status === 'sold' ? "contained" : "outlined"} onClick={() => setStatus('sold')} sx={{ flex: 1, marginX: 0.5 }}>Sold</Button>
           </Box>
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -87,13 +84,6 @@ export default function FindHouses() {
         </Grid>
 		<Grid item xs={12} sm={6}>
           <TextField label='State' value={state} onChange={(e) => setState(e.target.value)} fullWidth />
-        </Grid>
-		<Grid item xs={12}>
-          <Box display="flex" justifyContent="space-between">
-            <Button variant={status === 'for_sale' ? "contained" : "outlined"} onClick={() => setStatus('for_sale')} sx={{ flex: 1, marginX: 0.5 }}>For Sale</Button>
-            <Button variant={status === 'ready_to_build' ? "contained" : "outlined"} onClick={() => setStatus('ready_to_build')} sx={{ flex: 1, marginX: 0.5 }}>Ready to Build</Button>
-            <Button variant={status === 'sold' ? "contained" : "outlined"} onClick={() => setStatus('sold')} sx={{ flex: 1, marginX: 0.5 }}>Sold</Button>
-          </Box>
         </Grid>
         <Grid item xs={12}>
           <p>Price</p>
@@ -138,6 +128,16 @@ export default function FindHouses() {
             onChange={(e, newValue) => setAcres(newValue)}
             valueLabelDisplay='auto'
           />
+        </Grid>
+		<Grid item xs={12}>
+          <Box display="flex" justifyContent="space-between">
+		  	<Button variant="contained" onClick={search} sx={{ flex: 1, marginX: 0.5, marginY: 2}}>
+              Search
+            </Button>
+            <Button variant="contained" onClick={resetFilters} sx={{ flex: 1, marginX: 0.5, marginY: 2}}>
+              Reset Filters
+            </Button>
+          </Box>
         </Grid>
       </Grid>
       <h2>Results</h2>
