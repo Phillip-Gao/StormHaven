@@ -7,7 +7,7 @@ import config from './config.json';
 
 var favorites = []
 
-export default function FindHouses() {
+export default function Favorites() {
   const [pageSize, setPageSize] = useState(10);
   const [data, setData] = useState([]);
  

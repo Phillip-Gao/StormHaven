@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Dashboard from './Dashboard';
 import FindHouses from './FindHouses';
 import DisasterRisks from './DisasterRisks';
+import Favorites from './Favorites';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { createTheme } from "@mui/material/styles";
 
@@ -25,9 +26,10 @@ export default function App() {
 			<Router>
 				<Switch>
 					<Route exact path="/" render={() => <Dashboard />} />
-					<Route exact path="/dashboard" render={() => <Dashboard />} />
+					<Route exact path="/Dashboard" render={() => <Dashboard />} />
 					<Route path="/FindHouses" render={() => <FindHouses />} />
 					<Route path="/DisasterRisks" render={() => <DisasterRisks />} />
+					<Route path="/Favorites" render={() => <DisasterRisks />} />
 				</Switch>
 			</Router>
 			</ThemeProvider>
