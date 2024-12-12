@@ -309,32 +309,37 @@ function getMostRecentDisastersByState(req, res) {
   });
 }
 
-
-// Route 1: GET /properties
 const search_properties = async function (req, res) {
-  // TODO (TASK 12): return all songs that match the given search query with parameters defaulted to those specified in API spec ordered by title (ascending)
-  // Some default parameters have been provided for you, but you will need to fill in the rest
-  const city = req.query.city;
+  const propertyId = req.query.property_id;
+  const propertyIdFilter = propertyId  ? `p.property_id = ${propertyId}` : 'TRUE';
   const state = req.query.state;
+  const stateFilter = state  ? `state LIKE '%${state}%'` : 'TRUE';
+  const county = req.query.county_name;
+  const countyFilter = county  ? `county_name LIKE '%${county}%'` : 'TRUE';
+  const status = req.query.status;
+  const statusFilter = status  ? `status LIKE '%${status}%'` : 'TRUE';
   const priceLow = req.query.price_low ?? 0;
   const priceHigh = req.query.price_high ?? 10000000000;
   const bathroomsLow = req.query.bathrooms_low ?? 0;
   const bathroomsHigh = req.query.bathrooms_high ?? 100;
   const bedroomsLow = req.query.bedrooms_low ?? 0;
   const bedroomsHigh = req.query.bedrooms_high ?? 1000;
-  const acresLow = req.query.acresLow ?? 0;
-  const acresHigh = req.query.acresHigh ?? 10000;
-  const cityFilter = city ? `city LIKE '%${city}%'` : 'TRUE';
-  const stateFilter = state ? `state LIKE '%${state}%'` : 'TRUE';
+  const acreLotLow = req.query.acres_low ?? 0;
+  const acreLotHigh = req.query.acres_high ?? 10000;
 
+  // Adjusted SQL query to handle the new filters and join
   connection.query(`
     SELECT * 
-    FROM public.Property p 
-    JOIN public.features f ON p.property_id = f.property_id
-    WHERE price BETWEEN ${priceLow} AND ${priceHigh}
+    FROM public.Property p
+    JOIN public.Features f ON p.property_id = f.property_id
+    WHERE ${propertyIdFilter} 
+      AND ${stateFilter} 
+      AND ${countyFilter}
+      AND ${statusFilter}  
+      AND price BETWEEN ${priceLow} AND ${priceHigh}
       AND bathrooms BETWEEN ${bathroomsLow} AND ${bathroomsHigh}
       AND bedrooms BETWEEN ${bedroomsLow} AND ${bedroomsHigh}
-      AND acre_lot BETWEEN ${acresLow} AND ${acresHigh}
+      AND acre_lot BETWEEN ${acreLotLow} AND ${acreLotHigh}
     ORDER BY p.property_id ASC
     LIMIT 100;
   `, (err, data) => {
@@ -342,7 +347,7 @@ const search_properties = async function (req, res) {
       console.log(err);
       res.json([]);
     } else {
-      console.log("success")
+      console.log("Success");
       res.json(data.rows);
     }
   });
