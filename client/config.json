@@ -1,0 +1,9 @@
+{
+  "host": "database-2.ce7tcq2txzjc.us-east-1.rds.amazonaws.com",
+  "port": "5432",
+  "user" : "stormhaven_proj",
+  "password": "PhillipEvanNikkiNandini123",
+  "database": "stormhaven",
+  "server_host": "localhost",
+  "server_port": "8080"
+}
