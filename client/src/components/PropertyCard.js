@@ -35,7 +35,7 @@ export default function PropertyCard({ propertyId, handleClose }) {
         width={600}
       >
         <Typography variant="h4" component="h1" gutterBottom>
-          {propertyData.title || 'Property Details'}
+          {'Property Details'}
         </Typography>
         <Typography variant="h6">
           Price: ${propertyData.price || 'N/A'}
@@ -54,6 +54,9 @@ export default function PropertyCard({ propertyId, handleClose }) {
         </Typography>
         <Typography variant="h6">
           Status: {propertyData.status || 'N/A'}
+        </Typography>
+        <Typography variant="h4" component="h1" gutterBottom>
+          {'Disaster Details'}
         </Typography>
         <Button onClick={handleClose} sx={{ mt: 2 }}>
           Close
