@@ -318,19 +318,19 @@ const search_properties = async function (req, res) {
   const state = req.query.state;
   var stateFilter = 'TRUE';
   if (typeof state !== 'undefined' && state.length != 0) {
-    stateFilter = `state LIKE '%${state}%'`;
+    stateFilter = `state ILIKE '%${state}%'`;
   }
 
   const county = req.query.county_name;
   var countyFilter = 'TRUE';
   if (typeof county !== 'undefined' && county.length != 0) {
-    countyFilter = `county_name LIKE '%${county}%'`;
+    countyFilter = `county_name ILIKE '%${county}%'`;
   }
 
   const status = req.query.status;
   var statusFilter = 'TRUE';
   if (typeof status !== 'undefined' && status.length != 0) {
-    statusFilter = `status LIKE '%${status}%'`;
+    statusFilter = `status ILIKE '%${status}%'`;
   }
 
   const priceLow = req.query.price_low ?? 0;
@@ -370,46 +370,57 @@ const search_properties = async function (req, res) {
 
 
 const search_disasters = async function (req, res) {
-  // const propertyId = req.query.property_id;
-  // var propertyIdFilter  = 'TRUE';
-  // if (typeof propertyId !== 'undefined' && propertyId.length != 0) {
-  //   propertyIdFilter = `p.property_id = ${propertyId}`;
-  // }
+  const disasterId = req.query.disaster_id;
+  var disasterIdFilter  = 'TRUE';
+  if (typeof disasterId !== 'undefined' && disasterId.length != 0) {
+    disasterIdFilter = `d.disaster_id = ${disasterId}`;
+  }
 
-  // const state = req.query.state;
-  // var stateFilter = 'TRUE';
-  // if (typeof state !== 'undefined' && state.length != 0) {
-  //   stateFilter = `state LIKE '%${state}%'`;
-  // }
+  const disasterNumber = req.query.disasternumber;
+  var disasterNumberFilter = 'TRUE';
+  if (typeof disasterNumber !== 'undefined' && disasterNumber.length != 0) {
+    disasterNumberFilter = `d.disasternumber = ${disasterNumber}`;
+  }
 
-  // const county = req.query.county_name;
-  // var countyFilter = 'TRUE';
-  // if (typeof county !== 'undefined' && county.length != 0) {
-  //   countyFilter = `county_name LIKE '%${county}%'`;
-  // }
+  const typeCode = req.query.type_code;
+  var typeCodeFilter = 'TRUE';
+  if (typeof typeCode !== 'undefined' && typeCode.length != 0) {
+    typeCodeFilter = `dt.type_code = '${typeCode}'`;
+  }
 
-  // const status = req.query.status;
-  // var statusFilter = 'TRUE';
-  // if (typeof status !== 'undefined' && status.length != 0) {
-  //   statusFilter = `status LIKE '%${status}%'`;
-  // }
+  const county = req.query.county_name;
+  var countyFilter = 'TRUE';
+  if (typeof county !== 'undefined' && county.length != 0) {
+    countyFilter = `county_name ILIKE '%${county}%'`;
+  }
 
-  // const priceLow = req.query.price_low ?? 0;
-  // const priceHigh = req.query.price_high ?? 10000000000;
-  // const bathroomsLow = req.query.bathrooms_low ?? 0;
-  // const bathroomsHigh = req.query.bathrooms_high ?? 100;
-  // const bedroomsLow = req.query.bedrooms_low ?? 0;
-  // const bedroomsHigh = req.query.bedrooms_high ?? 1000;
-  // const acreLotLow = req.query.acres_low ?? 0;
-  // const acreLotHigh = req.query.acres_high ?? 10000;
+  var designatedDateLow = req.query.designateddate_low; 
+  if (typeof designatedDateLow !== 'undefined' && designatedDateLow.length != 0) {
+    designatedDateLow = req.query.designateddate_low;
+  } else {
+    designatedDateLow = "1000-01-01T00:00:00.000Z";
+  }
+
+  var designatedDateHigh = req.query.designateddate_high; 
+  if (typeof designatedDateHigh !== 'undefined' && designatedDateHigh.length != 0) {
+    designatedDateHigh = req.query.designateddate_high;
+  } else {
+    designatedDateHigh = "3000-01-01T00:00:00.000Z";
+  }
 
   // Adjusted SQL query to handle the new filters and join
   connection.query(`
     SELECT * 
     FROM public.Disaster d
     JOIN public.Disaster_Types dt ON d.disaster_id = dt.disaster_id
+    WHERE ${disasterIdFilter} 
+      AND ${disasterNumberFilter} 
+      AND ${typeCodeFilter}
+      AND ${countyFilter}  
+      AND d.designateddate >= '${designatedDateLow}'
+      AND d.designateddate <= '${designatedDateHigh}'
     ORDER BY d.disasternumber ASC
-    LIMIT 100;
+    LIMIT 1000;
   `, (err, data) => {
     if (err) {
       console.log(err);
@@ -420,8 +431,6 @@ const search_disasters = async function (req, res) {
     }
   });
 }
-
-
 
 // Export the new functions to be accessible in index.js
 module.exports = {

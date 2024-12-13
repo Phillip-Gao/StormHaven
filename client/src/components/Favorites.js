@@ -24,8 +24,6 @@ export function removeFavorite (id) {
 };
 
 export default function Favorites() {
-  console.log("hi")
-  console.log(favorites)
   return (
     <Container>
         <PageNavbar active='Favorites' />

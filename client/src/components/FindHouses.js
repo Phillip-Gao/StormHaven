@@ -33,8 +33,6 @@ export default function FindHouses() {
 
   const handleFavoriteToggle = (id) => {
     favorites.includes(id) ? removeFavorite(id) : addFavorite(id);
-    console.log("hi")
-    console.log(favorites);
   };
 
   const search = () => {
@@ -63,6 +61,7 @@ export default function FindHouses() {
     setBedrooms([0, 20]);
     setAcres([0, 5]);
   }
+
 
   const columns = [
     { field: 'property_id', headerName: 'Property ID', width: 150 },
