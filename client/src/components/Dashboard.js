@@ -6,10 +6,14 @@ import config from './config.json'; // Ensure you have this if you're using it
 
 export default function Dashboard(props) {
     const [disasters, setDisasters] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const [hasError, setHasError] = useState(false);
 
-    useEffect(() => {
+    // Fetch data when the component for Analytics is loaded
+    const fetchAnalyticsData = () => {
+        setIsLoading(true);
+        setHasError(false);
+
         fetch(`http://${config.server_host}:${config.server_port}/frequent-disaster-high-price-properties`)
             .then(response => {
                 if (!response.ok) {
@@ -26,7 +30,7 @@ export default function Dashboard(props) {
                 setHasError(true);
                 setIsLoading(false);
             });
-    }, []);
+    };
 
     return (
         <div className="Dashboard">
@@ -35,6 +39,18 @@ export default function Dashboard(props) {
                 <br />
                 <div className="section">
                     <h2>Overview</h2>
+                    <p>Overview content goes here.</p>
+                </div>
+                <br />
+                <div className="section">
+                    <h2>Analytics</h2>
+                    <button
+                        className="btn btn-primary"
+                        onClick={fetchAnalyticsData}
+                        style={{ marginBottom: '10px' }}
+                    >
+                        Load Frequent Disasters
+                    </button>
                     {isLoading ? (
                         <p>Loading...</p>
                     ) : hasError ? (
@@ -48,10 +64,6 @@ export default function Dashboard(props) {
                             </div>
                         )
                     )}
-                </div>
-                <br />
-                <div className="section">
-                    <h2>Analytics</h2>
                 </div>
             </div>
         </div>
