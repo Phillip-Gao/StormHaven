@@ -21,6 +21,7 @@ export default function FindHouses() {
   const [bathrooms, setBathrooms] = useState([0, 10]);
   const [bedrooms, setBedrooms] = useState([0, 20]);
   const [acres, setAcres] = useState([0, 5]);
+  
   useEffect(() => {
     fetch(`http://${config.server_host}:${config.server_port}/search_properties`)
       .then(res => res.json())
