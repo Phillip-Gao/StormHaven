@@ -18,6 +18,20 @@ const theme = createTheme({
 	},
   });
 
+export let favorites = [];
+
+export function addFavorite (id) {
+    if (!favorites.includes(id)) {
+        favorites.push(id);
+    }
+};
+
+export function removeFavorite (id) {
+    const index = favorites.indexOf(id);
+    if (index > -1) {
+        favorites.splice(index, 1);
+    }
+};
 
 export default function App() {
 	return (
@@ -29,7 +43,7 @@ export default function App() {
 					<Route exact path="/Dashboard" render={() => <Dashboard />} />
 					<Route path="/FindHouses" render={() => <FindHouses />} />
 					<Route path="/DisasterRisks" render={() => <DisasterRisks />} />
-					<Route path="/Favorites" render={() => <DisasterRisks />} />
+					<Route path="/Favorites" render={() => <Favorites/>} />
 				</Switch>
 			</Router>
 			</ThemeProvider>

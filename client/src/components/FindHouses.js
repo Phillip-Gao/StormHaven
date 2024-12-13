@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Container, Grid, Slider, TextField, Link, Box } from '@mui/material';
+import { Button, Container, Grid, Slider, TextField, Link, Box, Checkbox } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
 import { DataGrid } from '@mui/x-data-grid';
 import PageNavbar from './PageNavbar';
 import config from './config.json';
-
-var favorites = []
+import { favorites, addFavorite, removeFavorite } from './Favorites';
 
 export default function FindHouses() {
   const [pageSize, setPageSize] = useState(10);
@@ -20,14 +19,23 @@ export default function FindHouses() {
   const [bedrooms, setBedrooms] = useState([0, 20]);
   const [acres, setAcres] = useState([0, 5]);
 
+
   useEffect(() => {
     fetch(`http://${config.server_host}:${config.server_port}/search_properties`)
       .then(res => res.json())
       .then(resJson => {
-        const propertiesWithId = resJson.map(property => ({ id: property.property_id, ...property }));
+        const propertiesWithId = resJson.map(property => ({ 
+          id: property.property_id, ...property,
+        }));
         setData(propertiesWithId);
       });
   }, []);
+
+  const handleFavoriteToggle = (id) => {
+    favorites.includes(id) ? removeFavorite(id) : addFavorite(id);
+    console.log("hi")
+    console.log(favorites);
+  };
 
   const search = () => {
     const query = `http://${config.server_host}:${config.server_port}/search_properties?` +
@@ -59,12 +67,25 @@ export default function FindHouses() {
   const columns = [
     { field: 'property_id', headerName: 'Property ID', width: 150 },
     { field: 'county_name', headerName: 'City', width: 150 },
-	{ field: 'state', headerName: "State", width: 150 },
+	  { field: 'state', headerName: "State", width: 150 },
     { field: 'price', headerName: 'Price', width: 150 },
     { field: 'bathrooms', headerName: 'Bathrooms' },
     { field: 'bedrooms', headerName: 'Bedrooms' },
     { field: 'acre_lot', headerName: 'Acres' },
-    { field: 'status', headerName: 'Status' }
+    { field: 'status', headerName: 'Status' },
+    {
+      field: 'fav',
+      headerName: 'Favorites',
+      width: 130,
+      renderCell: (params) => (
+        <Checkbox
+          checked={params.value || favorites.includes(params.id)}
+          onChange={() => handleFavoriteToggle(params.id)}
+          color="primary"
+        />
+      ),
+      disableClickEventBubbling: true,
+    }
   ];
 
   return (
@@ -72,20 +93,43 @@ export default function FindHouses() {
       <PageNavbar active='FindHouses' />
       <h2>Search Properties</h2>
       <Grid container spacing={2}>
-	 	<Grid item xs={12} sm={6}>
-          <TextField label='Property ID' value={propertyId} onChange={(e) => setPropertyId(e.target.value)} fullWidth />
+	 	    <Grid item xs={12} sm={6}>
+          <TextField 
+          label='Property ID' 
+          value={propertyId} 
+          onChange={(e) => setPropertyId(e.target.value)} 
+          fullWidth 
+        />
         </Grid>
-		<Grid item xs={12} sm={6}>
+		    <Grid item xs={12} sm={6}>
           <Box display="flex" justifyContent="space-between">
-		  	<Button variant={status === 'for_sale' ? "contained" : "outlined"} onClick={() => setStatus('for_sale')} sx={{ flex: 1, marginX: 0.5 }}>For Sale</Button>
-            <Button variant={status === 'sold' ? "contained" : "outlined"} onClick={() => setStatus('sold')} sx={{ flex: 1, marginX: 0.5 }}>Sold</Button>
+		  	    <Button 
+              variant={status === 'for_sale' ? "contained" : "outlined"} 
+              onClick={() => setStatus('for_sale')} 
+              sx={{ flex: 1, marginX: 0.5 }}>
+                For Sale
+            </Button>
+            <Button 
+              variant={status === 'sold' ? "contained" : "outlined"} 
+              onClick={() => setStatus('sold')} 
+              sx={{ flex: 1, marginX: 0.5 }}>
+                Sold
+            </Button>
           </Box>
         </Grid>
         <Grid item xs={12} sm={6}>
-          <TextField label='City' value={countyName} onChange={(e) => setCountyName(e.target.value)} fullWidth />
+          <TextField 
+            label='City' 
+            value={countyName} 
+            onChange={(e) => setCountyName(e.target.value)} 
+            fullWidth />
         </Grid>
-		<Grid item xs={12} sm={6}>
-          <TextField label='State' value={state} onChange={(e) => setState(e.target.value)} fullWidth />
+		    <Grid item xs={12} sm={6}>
+          <TextField 
+            label='State' 
+            value={state} 
+            onChange={(e) => setState(e.target.value)} 
+            fullWidth />
         </Grid>
         <Grid item xs={12}>
           <p>Price</p>
@@ -132,12 +176,20 @@ export default function FindHouses() {
           />
         </Grid>
 		<Grid item xs={12}>
-          <Box display="flex" justifyContent="space-between">
-		  	<Button variant="contained" onClick={search} sx={{ flex: 1, marginX: 0.5, marginY: 2}}>
+        <Box display="flex" justifyContent="space-between">
+		  	<Button 
+          variant="contained" 
+          onClick={search} 
+          sx={{ flex: 1, marginX: 0.5, marginY: 2}}
+        >
               Search
             </Button>
-            <Button variant="contained" onClick={resetFilters} sx={{ flex: 1, marginX: 0.5, marginY: 2}}>
-              Reset Filters
+            <Button 
+              variant="contained" 
+              onClick={resetFilters} 
+              sx={{ flex: 1, marginX: 0.5, marginY: 2}}
+            >
+                Reset Filters
             </Button>
           </Box>
         </Grid>
