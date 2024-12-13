@@ -22,33 +22,37 @@ connection.connect((err) => err && console.log(err));
 // Query 1: Find the most frequent disaster types in locations where the
 // average property price exceeds $500,000, grouped by type_code.
 // Complex Query 1 (For Analytics in Dashboard)
-function getFrequentDisasterHighPriceProperties(req, res) {
-  var query = `
-WITH High_Priced_Locations AS (
-    SELECT l.city, l.state, p.property_id
-    FROM Located l
-    JOIN Property p ON l.property_id = p.property_id
-    GROUP BY l.city, l.state, p.property_id
-    HAVING AVG(p.price) > 500000
-),
-Disaster_Frequency AS (
-    SELECT dt.type_code, COUNT(d.disaster_id) AS disaster_count
-    FROM High_Priced_Locations hpl
-    JOIN Located l ON hpl.city = l.city AND hpl.state = l.state AND hpl.property_id = l.property_id
-    JOIN Disaster d ON l.disaster_id = d.disaster_id
-    JOIN Disaster_Types dt ON d.disaster_id = dt.disaster_id
-    GROUP BY dt.type_code
-)
-SELECT type_code, disaster_count
-FROM Disaster_Frequency
-ORDER BY disaster_count DESC
-LIMIT 10;
-    `;
-  connection.query(query, function(err, rows, fields) {
-    if (err) console.log(err);
-    else res.json(rows);
-  });
-}
+const getFrequentDisasterHighPriceProperties = async function (req, res) {
+  const query = `
+    WITH High_Priced_Locations AS (
+        SELECT l.city, l.state, p.property_id
+        FROM Located l
+        JOIN Property p ON l.property_id = p.property_id
+        GROUP BY l.city, l.state, p.property_id
+        HAVING AVG(p.price) > 500000
+    ),
+    Disaster_Frequency AS (
+        SELECT dt.type_code, COUNT(d.disaster_id) AS disaster_count
+        FROM High_Priced_Locations hpl
+        JOIN Located l ON hpl.city = l.city AND hpl.state = l.state AND hpl.property_id = l.property_id
+        JOIN Disaster d ON l.disaster_id = d.disaster_id
+        JOIN Disaster_Types dt ON d.disaster_id = dt.disaster_id
+        GROUP BY dt.type_code
+    )
+    SELECT type_code, disaster_count
+    FROM Disaster_Frequency
+    ORDER BY disaster_count DESC
+    LIMIT 10;
+  `;
+
+  try {
+    const { rows } = await connection.query(query);
+    res.json(rows); // Send the rows as JSON response directly
+  } catch (err) {
+    console.error('SQL Error: ', err);
+    res.status(500).json({ error: 'Internal server error' }); // Send JSON formatted error message
+  }
+};
 
 // Query 2: List properties that have no disasters recorded in the past 5 years but 
 // are located in areas historically affected by high-risk disasters (e.g., type_code = 'HM').
@@ -115,28 +119,28 @@ function getSafestPropertiesInHighRiskAreas(req, res) {
 function getPropertiesWithAllDisasters(req, res) {
   var query = `
     WITH Disaster_Types_Per_Location AS (
-      SELECT l.city, l.state, dt.type_code
-      FROM Disaster d
-      JOIN Disaster_Types dt ON d.disaster_id = dt.disaster_id
-      JOIN Located l ON d.disaster_id = l.disaster_id
-      GROUP BY l.city, l.state, dt.type_code
+        SELECT l.city, l.state, dt.type_code
+        FROM Disaster d
+        JOIN Disaster_Types dt ON d.disaster_id = dt.disaster_id
+        JOIN Located l ON d.disaster_id = l.disaster_id
+        GROUP BY l.city, l.state, dt.type_code
     ),
     Property_Disaster_Types AS (
-      SELECT l.city, l.state, p.property_id, dt.type_code
-      FROM Property p
-      JOIN Located l ON p.property_id = l.property_id
-      JOIN Property_Disaster pd ON p.property_id = pd.property_id
-      JOIN Disaster_Types dt ON pd.disaster_id = dt.disaster_id
+        SELECT l.city, l.state, p.property_id, dt.type_code
+        FROM Property p
+        JOIN Located l ON p.property_id = l.property_id
+        JOIN Disaster d ON l.disaster_id = d.disaster_id
+        JOIN Disaster_Types dt ON d.disaster_id = dt.disaster_id
     ),
     All_Disaster_Types_Check AS (
-      SELECT pd.property_id
-      FROM Property_Disaster_Types pd
-      GROUP BY pd.property_id, pd.city, pd.state
-      HAVING COUNT(DISTINCT pd.type_code) = (
-          SELECT COUNT(DISTINCT d.type_code)
-          FROM Disaster_Types_Per_Location d
-          WHERE d.city = pd.city AND d.state = pd.state
-      )
+        SELECT pd.property_id
+        FROM Property_Disaster_Types pd
+        GROUP BY pd.property_id, pd.city, pd.state
+        HAVING COUNT(DISTINCT pd.type_code) = (
+            SELECT COUNT(DISTINCT d.type_code)
+            FROM Disaster_Types_Per_Location d
+            WHERE d.city = pd.city AND d.state = pd.state
+        )
     )
     SELECT DISTINCT p.property_id, l.city, l.state
     FROM Property p
