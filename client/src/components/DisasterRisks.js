@@ -8,6 +8,7 @@ import { formatDate, exportDate } from '../helpers/formatter';
 export default function DisasterRisks() {
   const [pageSize, setPageSize] = useState(10);
   const [data, setData] = useState([]);
+  const [trendsData, setTrendsData] = useState([]);
 
   const [disasterId, setDisasterId] = useState('');
   const [disasterNumber, setDisasterNumber] = useState('');
@@ -25,6 +26,12 @@ export default function DisasterRisks() {
 		  const disastersWithId = resJson.map(disaster => ({ id: disaster.disaster_id, ...disaster }));
 		  setData(disastersWithId);
 		});
+    fetch(`http://${config.server_host}:${config.server_port}/disaster-trends`)
+      .then(res => res.json())
+      .then(resJson => {
+        const trendsWithId = resJson.map(trend => ({ id: trend.index, ...trend }));
+        setTrendsData(trendsWithId);
+      });
 	}, []);
 
   const search = () => {
@@ -92,6 +99,12 @@ export default function DisasterRisks() {
     // { field: 'entrydate', headerName: 'Entry Date', width: 150, valueGetter: (value) => {return formatDate(value)},  },
     // { field: 'closeoutdate', headerName: 'Closeout Date', width: 150, valueGetter: (value) => {return formatDate(value)}, },
 	{ field: 'type_description', headerName: 'Description', width: 300}
+  ];
+
+  const trendsColumns = [
+    { field: 'year', headerName: 'Year', width: 350 },
+    { field: 'type_description', headerName: 'Disaster Type', width: 350 },
+    { field: 'disaster_count', headerName: 'Disaster Count', width: 350 }
   ];
 
   return (
@@ -175,6 +188,15 @@ export default function DisasterRisks() {
       <DataGrid
         rows={data}
         columns={columns}
+        pageSize={pageSize}
+        rowsPerPageOptions={[5, 10, 25]}
+        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+        autoHeight
+      />
+      <h2>Disaster Trends</h2>
+      <DataGrid
+        rows={trendsData}
+        columns={trendsColumns}
         pageSize={pageSize}
         rowsPerPageOptions={[5, 10, 25]}
         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}

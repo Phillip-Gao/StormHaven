@@ -217,12 +217,12 @@ function getFrequentDisasterProperties(req, res) {
 function getAffectedPropertyInPastTwoYears(req, res) {
   var query = `
   SELECT DISTINCT p.property_id, p.price, p.status, l.city, l.state, d.designateddate
-FROM Property p
-JOIN Located l ON p.property_id = l.property_id
-JOIN Disaster d ON l.disaster_id = d.disaster_id
-WHERE d.designateddate >= NOW() - INTERVAL '2 year'
-ORDER BY d.designateddate DESC
-LIMIT 100;
+  FROM Property p
+  JOIN Located l ON p.property_id = l.property_id
+  JOIN Disaster d ON l.disaster_id = d.disaster_id
+  WHERE d.designateddate >= NOW() - INTERVAL '2 year'
+  ORDER BY d.designateddate DESC
+  LIMIT 100;
   `;
   connection.query(query, function(err, rows, fields) {
     if (err) console.log(err);
@@ -232,16 +232,25 @@ LIMIT 100;
 
 // Query 9: Summarizes disaster counts per year by type
 function getDisasterTrends(req, res) {
-  var query = `
-    SELECT YEAR(d.designated_date) AS year, dt.type_description, COUNT(d.disaster_id) AS disaster_count 
-    FROM disaster d 
-    JOIN disaster_types dt ON d.disaster_id = dt.disaster_id 
-    GROUP BY year, dt.type_description 
-    ORDER BY year DESC, disaster_count DESC;
-  `;
-  connection.query(query, function(err, rows, fields) {
-    if (err) console.log(err);
-    else res.json(rows);
+  connection.query(`
+  SELECT 
+    row_number() OVER (ORDER BY EXTRACT(YEAR FROM designateddate) DESC, COUNT(d.disaster_id) DESC) AS index, 
+    EXTRACT(YEAR FROM designateddate) AS year, 
+    dt.type_description, 
+    COUNT(d.disaster_id) AS disaster_count 
+  FROM disaster d 
+  JOIN disaster_types dt ON d.disaster_id = dt.disaster_id 
+  WHERE EXTRACT(YEAR FROM designateddate) <= 2024
+  GROUP BY year, dt.type_description 
+  ORDER BY year DESC, disaster_count DESC;
+  `, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.json([]);
+    } else {
+      console.log("Success");
+      res.json(data.rows);
+    }
   });
 }
 
@@ -390,7 +399,7 @@ function get_disasters_for_property(req, res) {
     JOIN public.disaster_types dt ON d.disaster_id = dt.disaster_id
     WHERE ${propertyIdFilter}
     ORDER BY d.designateddate DESC
-    LIMIT 100;
+    LIMIT 1000;
   `, (err, data) => {
     if (err) {
       console.log(err);

@@ -44,7 +44,7 @@ app.use(cors({
  app.get('/affected-properties-past-two-years', routes.getAffectedPropertyInPastTwoYears);
 
 // // Query 9: Summarizes disaster counts per year by type
-// app.get('/disaster-trends', routes.getDisasterTrends);
+app.get('/disaster-trends', routes.getDisasterTrends);
 
 // // Query 10: Finds properties with minimum specified bedrooms and bathrooms
 // app.get('/large-properties', routes.getLargeProperties);

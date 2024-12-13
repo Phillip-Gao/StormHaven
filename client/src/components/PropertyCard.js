@@ -69,7 +69,7 @@ export default function PropertyCard({ propertyId, handleClose }) {
           borderRadius: 2,
           border: '2px solid #000',
           width: 1000,
-          height: 1250,
+          height: 800,
           overflow: 'auto'
         }}
       >
