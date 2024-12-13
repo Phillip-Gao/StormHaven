@@ -24,10 +24,10 @@ app.get('/', (req, res) => {
 /* ---- (Dashboard) ---- */
 
 // // Query 1: Find the most frequent disaster types in locations where the average property price exceeds $500,000
-// app.get('/frequent-disaster-high-price-properties', routes.getFrequentDisasterHighPriceProperties);
+app.get('/frequent-disaster-high-price-properties', routes.getFrequentDisasterHighPriceProperties);
 
 // // Query 2: List properties with no disasters in the past 5 years in high-risk disaster areas
-// app.get('/recently-unimpacted-high-risk-areas', routes.getRecentlyUnimpactedHighRiskAreas);
+app.get('/recently-unimpacted-high-risk-areas', routes.getRecentlyUnimpactedHighRiskAreas);
 
 // // Query 3: Retrieve properties with fewer disasters than the average in their location
 // app.get('/safest-properties-in-high-risk-areas', routes.getSafestPropertiesInHighRiskAreas);
@@ -39,13 +39,13 @@ app.get('/', (req, res) => {
 // app.get('/top-affected-areas', routes.getTopAffectedAreas);
 
 // // Query 6: Identifies properties affected by the highest number of disaster events
-// app.get('/most-affected-properties', routes.getMostAffectedProperties);
+app.get('/most-affected-properties', routes.getMostAffectedProperties);
 
 // // Query 7: Finds properties in frequent disaster areas and under a price threshold
 // app.get('/frequent-disaster-properties', routes.getFrequentDisasterProperties);
 
 // // Query 8: Retrieves properties with 3+ bedrooms, 2+ bathrooms, and no disaster history
-// app.get('/safe-large-properties', routes.getSafeLargeProperties);
+app.get('/affected-properties-past-two-years', routes.getAffectedPropertyInPastTwoYears);
 
 // // Query 9: Summarizes disaster counts per year by type
 // app.get('/disaster-trends', routes.getDisasterTrends);

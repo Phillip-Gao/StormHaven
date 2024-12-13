@@ -21,27 +21,28 @@ connection.connect((err) => err && console.log(err));
 
 // Query 1: Find the most frequent disaster types in locations where the
 // average property price exceeds $500,000, grouped by type_code.
+// Complex Query 1 (For Analytics in Dashboard)
 function getFrequentDisasterHighPriceProperties(req, res) {
   var query = `
-    WITH High_Priced_Locations AS (
-      SELECT l.city, l.state
-      FROM Located l
-      JOIN Property p ON l.property_id = p.property_id
-      GROUP BY l.city, l.state
-      HAVING AVG(p.price) > 500000
-    ),
-    Frequent_Disaster_Types AS (
-      SELECT dt.type_code, COUNT(d.disaster_id) AS disaster_count
-      FROM High_Priced_Locations hpl
-      JOIN Located l ON hpl.city = l.city AND hpl.state = l.state
-      JOIN Property_Disaster pd ON l.property_id = pd.property_id
-      JOIN Disaster d ON pd.disaster_id = d.disaster_id
-      JOIN Disaster_Types dt ON d.disaster_id = dt.disaster_id
-      GROUP BY dt.type_code
-    )
-    SELECT type_code, disaster_count
-    FROM Frequent_Disaster_Types
-    ORDER BY disaster_count DESC;
+WITH High_Priced_Locations AS (
+    SELECT l.city, l.state, p.property_id
+    FROM Located l
+    JOIN Property p ON l.property_id = p.property_id
+    GROUP BY l.city, l.state, p.property_id
+    HAVING AVG(p.price) > 500000
+),
+Disaster_Frequency AS (
+    SELECT dt.type_code, COUNT(d.disaster_id) AS disaster_count
+    FROM High_Priced_Locations hpl
+    JOIN Located l ON hpl.city = l.city AND hpl.state = l.state AND hpl.property_id = l.property_id
+    JOIN Disaster d ON l.disaster_id = d.disaster_id
+    JOIN Disaster_Types dt ON d.disaster_id = dt.disaster_id
+    GROUP BY dt.type_code
+)
+SELECT type_code, disaster_count
+FROM Disaster_Frequency
+ORDER BY disaster_count DESC
+LIMIT 10;
     `;
   connection.query(query, function(err, rows, fields) {
     if (err) console.log(err);
@@ -51,27 +52,26 @@ function getFrequentDisasterHighPriceProperties(req, res) {
 
 // Query 2: List properties that have no disasters recorded in the past 5 years but 
 // are located in areas historically affected by high-risk disasters (e.g., type_code = 'HM').
+// Complex Query 2 (For Overview in  Dashboard)
 function getRecentlyUnimpactedHighRiskAreas(req, res) {
   var query = `
-    WITH Recent_Disasters AS (
-      SELECT DISTINCT pd.property_id
-      FROM Property_Disaster pd
-      JOIN Disaster d ON pd.disaster_id = d.disaster_id
-      WHERE d.designated_date >= CURRENT_DATE - INTERVAL '5 YEARS'
-    ),
-    High_Risk_Areas AS (
-      SELECT DISTINCT l.city, l.state
-      FROM Located l
-      JOIN Disaster d ON l.disaster_id = d.disaster_id
-      JOIN Disaster_Types dt ON d.disaster_id = dt.disaster_id
-      WHERE dt.type_code = 'HM'
-    )
-    SELECT p.property_id, l.city, l.state
-    FROM Property p
-    JOIN Located l ON p.property_id = l.property_id
-    WHERE l.city IN (SELECT city FROM High_Risk_Areas)
-    AND l.state IN (SELECT state FROM High_Risk_Areas)
-    AND p.property_id NOT IN (SELECT property_id FROM Recent_Disasters);
+WITH Recent_Disasters AS (
+    SELECT DISTINCT l.property_id
+    FROM Located l
+    JOIN Disaster d ON l.disaster_id = d.disaster_id
+    WHERE d.designateddate >= CURRENT_DATE - INTERVAL '5 YEARS'
+),
+High_Risk_Areas AS (
+    SELECT DISTINCT l.city, l.state
+    FROM Located l
+    JOIN Disaster_Types dt ON l.disaster_id = dt.disaster_id
+    WHERE dt.type_code = 'HM'
+)
+SELECT p.property_id, l.city, l.state
+FROM Property p
+JOIN Located l ON p.property_id = l.property_id
+WHERE (l.city, l.state) IN (SELECT city, state FROM High_Risk_Areas)
+  AND p.property_id NOT IN (SELECT property_id FROM Recent_Disasters);
    `;
   connection.query(query, function(err, rows, fields) {
     if (err) console.log(err);
@@ -167,17 +167,20 @@ function getTopAffectedAreas(req, res) {
   });
 }
 
-// Query 6: Identifies properties affected by the highest number of disaster events
+// Query 6: Identifies properties affected by the highest number of disaster events in past year
+// Part of overview on Dashboard
 function getMostAffectedProperties(req, res) {
   var query = `
-    SELECT p.property_id, p.price, COUNT(pd.disaster_id) AS disaster_count 
-    FROM Property p 
-    JOIN Property_Disaster pd ON p.property_id = pd.property_id 
-    GROUP BY p.property_id 
-    HAVING disaster_count = (SELECT MAX(count) 
-               FROM (SELECT COUNT(disaster_id) AS count 
-                     FROM Property_Disaster 
-                     GROUP BY property_id) AS subquery);
+      SELECT
+      l.city,
+      l.state,
+      l.county_name,
+      COUNT(DISTINCT l.property_id) AS affected_properties
+      FROM Located l
+      JOIN Disaster d ON l.disaster_id = d.disaster_id
+      GROUP BY l.city, l.state, l.county_name
+      ORDER BY affected_properties DESC
+      LIMIT 20;
   `;
   connection.query(query, function(err, rows, fields) {
     if (err) console.log(err);
@@ -204,19 +207,15 @@ function getFrequentDisasterProperties(req, res) {
   });
 }
 
-// Query 8: Retrieves properties with 3+ bedrooms, 2+ bathrooms, and no disaster history
-function getSafeLargeProperties(req, res) {
+// Query 8: Retrieves properties with that have been affected by a disaster in the past 2 years
+// Part of overview on Dashboard
+function getAffectedPropertyInPastTwoYears(req, res) {
   var query = `
-    SELECT p.property_id, p.price, f.bedrooms, f.bathrooms, f.acre_lot
-    FROM property p
-    INNER JOIN features f ON p.property_id = f.property_id
-    WHERE f.bedrooms >= 3
-      AND f.bathrooms >= 2
-      AND p.property_id NOT IN (
-          SELECT DISTINCT pd.property_id
-          FROM Property_Disaster pd
-      )
-    ORDER BY p.property_id;
+  SELECT DISTINCT p.property_id, p.price, p.status, l.city, l.state, d.designateddate
+  FROM Property p
+  JOIN Located l ON p.property_id = l.property_id
+  JOIN Disaster d ON l.disaster_id = d.disaster_id
+  WHERE d.designateddate >= NOW() - INTERVAL '2 year';
   `;
   connection.query(query, function(err, rows, fields) {
     if (err) console.log(err);
@@ -433,7 +432,7 @@ module.exports = {
   getTopAffectedAreas,
   getMostAffectedProperties,
   getFrequentDisasterProperties,
-  getSafeLargeProperties,
+  getAffectedPropertyInPastTwoYears,
   getDisasterTrends,
   getLargeProperties,
   getCaliforniaDisasters,
