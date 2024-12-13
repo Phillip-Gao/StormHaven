@@ -4,11 +4,14 @@ import { createTheme } from '@mui/material/styles';
 import { DataGrid } from '@mui/x-data-grid';
 import PageNavbar from './PageNavbar';
 import config from './config.json';
-import { favorites, addFavorite, removeFavorite } from './Favorites';
+import { formatStatus } from '../helpers/formatter';
 
 export default function FindHouses() {
   const [pageSize, setPageSize] = useState(10);
   const [data, setData] = useState([]);
+  const [favorites, setFavorites] = useState(() => {
+    return JSON.parse(localStorage.getItem('favorites')) || [];
+  });
  
   const [propertyId, setPropertyId] = useState('');
   const [countyName, setCountyName] = useState('');
@@ -32,7 +35,14 @@ export default function FindHouses() {
   }, []);
 
   const handleFavoriteToggle = (id) => {
-    favorites.includes(id) ? removeFavorite(id) : addFavorite(id);
+    let updatedFavorites;
+    if (favorites.includes(id)) {
+      updatedFavorites = favorites.filter(favId => favId !== id);
+    } else {
+      updatedFavorites = [...favorites, id];
+    }
+    setFavorites(updatedFavorites);
+    localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
   };
 
   const search = () => {
@@ -62,7 +72,6 @@ export default function FindHouses() {
     setAcres([0, 5]);
   }
 
-
   const columns = [
     { field: 'property_id', headerName: 'Property ID', width: 150 },
     { field: 'county_name', headerName: 'City', width: 150 },
@@ -71,7 +80,7 @@ export default function FindHouses() {
     { field: 'bathrooms', headerName: 'Bathrooms' },
     { field: 'bedrooms', headerName: 'Bedrooms' },
     { field: 'acre_lot', headerName: 'Acres' },
-    { field: 'status', headerName: 'Status' },
+    { field: 'status', headerName: 'Status', valueGetter: (value) => {return formatStatus(value)}},
     {
       field: 'fav',
       headerName: 'Favorites',
