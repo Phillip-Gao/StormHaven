@@ -4,14 +4,12 @@ import { createTheme } from '@mui/material/styles';
 import { DataGrid } from '@mui/x-data-grid';
 import PageNavbar from './PageNavbar';
 import config from './config.json';
+import { favorites, addFavorite, removeFavorite } from './Favorites';
 import { formatStatus } from '../helpers/formatter';
 
 export default function FindHouses() {
   const [pageSize, setPageSize] = useState(10);
   const [data, setData] = useState([]);
-  const [favorites, setFavorites] = useState(() => {
-    return JSON.parse(localStorage.getItem('favorites')) || [];
-  });
  
   const [propertyId, setPropertyId] = useState('');
   const [countyName, setCountyName] = useState('');
@@ -21,8 +19,6 @@ export default function FindHouses() {
   const [bathrooms, setBathrooms] = useState([0, 10]);
   const [bedrooms, setBedrooms] = useState([0, 20]);
   const [acres, setAcres] = useState([0, 5]);
-
-
   useEffect(() => {
     fetch(`http://${config.server_host}:${config.server_port}/search_properties`)
       .then(res => res.json())
@@ -35,14 +31,15 @@ export default function FindHouses() {
   }, []);
 
   const handleFavoriteToggle = (id) => {
-    let updatedFavorites;
-    if (favorites.includes(id)) {
-      updatedFavorites = favorites.filter(favId => favId !== id);
+    if (favorites.some(fav => fav.id === id)) {
+      removeFavorite(id);
     } else {
-      updatedFavorites = [...favorites, id];
+      addFavorite(id);
     }
-    setFavorites(updatedFavorites);
-    localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+    setData(data.map(property => ({
+      ...property,
+      isFavorite: favorites.some(fav => fav.id === property.id),
+    })));
   };
 
   const search = () => {
@@ -80,20 +77,19 @@ export default function FindHouses() {
     { field: 'bathrooms', headerName: 'Bathrooms' },
     { field: 'bedrooms', headerName: 'Bedrooms' },
     { field: 'acre_lot', headerName: 'Acres' },
-    { field: 'status', headerName: 'Status', valueGetter: (value) => {return formatStatus(value)}},
+    { field: 'status', headerName: 'Status', valueGetter: (value) => {return formatStatus(value)} },
     {
       field: 'fav',
       headerName: 'Favorites',
       width: 130,
       renderCell: (params) => (
         <Checkbox
-          checked={params.value || favorites.includes(params.id)}
+          checked={favorites.some(fav => fav.id === params.id)}
           onChange={() => handleFavoriteToggle(params.id)}
           color="primary"
         />
       ),
-      disableClickEventBubbling: true,
-    }
+    },
   ];
 
   return (
