@@ -116,7 +116,10 @@ export default function Dashboard(props) {
             <PageNavbar active="Dashboard" />
             <div className="container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <br />
-
+				<div className="introduction">
+                    <h1>Welcome to StormHaven!</h1>
+                    <p>Discover Your Next Home with Confidence. Safe Haven Realty is your premier destination for finding properties tailored to your lifestyle while navigating disaster risks. Explore, compare, and secure your future home with insights into disaster risks and real-time data visualization.</p>
+                </div>
                 {/* Overview Section */}
                 <div className="section" style={{ textAlign: 'center', width: '100%' }}>
                     <h2 style={{ textAlign: 'center' }}>Overview</h2>
