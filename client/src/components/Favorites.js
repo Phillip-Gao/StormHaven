@@ -6,6 +6,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import PageNavbar from './PageNavbar';
 import config from './config.json';
 import { formatStatus } from '../helpers/formatter';
+import PropertyCard from './PropertyCard'; 
 
 export let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
 
@@ -28,6 +29,7 @@ export function updateNote(id, note) {
 
 export default function Favorites() {
   const [data, setData] = useState([]);
+  const [selectedPropertyId, setSelectedPropertyId] = useState(null);
 
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -65,7 +67,9 @@ export default function Favorites() {
   };
 
   const columns = [
-    { field: 'property_id', headerName: 'Property ID' },
+    { field: 'property_id', headerName: 'Property ID', width: 150, renderCell: (params) => (
+      <Button onClick={() => setSelectedPropertyId(params.id)}>{params.value}</Button>
+    ) },
     { field: 'county_name', headerName: 'City' },
     { field: 'state', headerName: 'State' },
     { field: 'price', headerName: 'Price' },
@@ -109,6 +113,7 @@ export default function Favorites() {
 
   return (
     <Container>
+      {selectedPropertyId && <PropertyCard propertyId={selectedPropertyId} handleClose={() => setSelectedPropertyId(null)} />}   
       <PageNavbar active="Favorites" />
       <h2>Your Favorites</h2>
       <DataGrid
