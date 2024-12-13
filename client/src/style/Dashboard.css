@@ -20,3 +20,14 @@
 .findHouse-headspace {
   padding-top: 2rem !important;
 }
+
+.btn-primary {
+  background-color: #323d73 !important; /* Set the background color */
+  border-color: #323d73 !important;    /* Match the border color */
+  color: white !important;            /* Ensure the text color is readable */
+}
+
+.btn-primary:hover {
+  background-color: #4a59a3 !important; /* Slightly lighter shade on hover */
+  border-color: #4a59a3 !important;    /* Match hover border */
+}

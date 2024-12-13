@@ -60,10 +60,10 @@ const getFrequentDisasterHighPriceProperties = async function (req, res) {
 function getRecentlyUnimpactedHighRiskAreas(req, res) {
   var query = `
 WITH Recent_Disasters AS (
-    SELECT DISTINCT l.property_id
-    FROM Located l
-    JOIN Disaster d ON l.disaster_id = d.disaster_id
-    WHERE d.designateddate >= CURRENT_DATE - INTERVAL '5 YEARS'
+  SELECT DISTINCT l.property_id
+  FROM Located l
+  JOIN Disaster d ON l.disaster_id = d.disaster_id
+  WHERE d.designateddate >= CURRENT_DATE - INTERVAL '5 YEARS'
 ),
 High_Risk_Areas AS (
     SELECT DISTINCT l.city, l.state
@@ -75,7 +75,8 @@ SELECT p.property_id, l.city, l.state
 FROM Property p
 JOIN Located l ON p.property_id = l.property_id
 WHERE (l.city, l.state) IN (SELECT city, state FROM High_Risk_Areas)
-  AND p.property_id NOT IN (SELECT property_id FROM Recent_Disasters);
+  AND p.property_id NOT IN (SELECT property_id FROM Recent_Disasters)
+  LIMIT 100;
    `;
   connection.query(query, function(err, rows, fields) {
     if (err) console.log(err);
@@ -216,10 +217,12 @@ function getFrequentDisasterProperties(req, res) {
 function getAffectedPropertyInPastTwoYears(req, res) {
   var query = `
   SELECT DISTINCT p.property_id, p.price, p.status, l.city, l.state, d.designateddate
-  FROM Property p
-  JOIN Located l ON p.property_id = l.property_id
-  JOIN Disaster d ON l.disaster_id = d.disaster_id
-  WHERE d.designateddate >= NOW() - INTERVAL '2 year';
+FROM Property p
+JOIN Located l ON p.property_id = l.property_id
+JOIN Disaster d ON l.disaster_id = d.disaster_id
+WHERE d.designateddate >= NOW() - INTERVAL '2 year'
+ORDER BY d.designateddate DESC
+LIMIT 100;
   `;
   connection.query(query, function(err, rows, fields) {
     if (err) console.log(err);
