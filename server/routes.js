@@ -372,6 +372,32 @@ const search_properties = async function (req, res) {
   });
 }
 
+// Retrieves the disasters that have happened at a given property id
+function get_disasters_for_property(req, res) {
+  const propertyId = req.query.property_id;
+  var propertyIdFilter  = 'TRUE';
+  if (typeof propertyId !== 'undefined' && propertyId.length != 0) {
+    propertyIdFilter = `p.property_id = ${propertyId}`;
+  }
+
+  connection.query(`
+    SELECT DISTINCT(d.disaster_id), d.disasternumber, d.designateddate, d.closeoutdate, dt.type_code, dt.type_description
+    FROM public.property p
+    JOIN public.disaster d ON p.county_name = d.county_name
+    JOIN public.disaster_types dt ON d.disaster_id = dt.disaster_id
+    WHERE ${propertyIdFilter}
+    ORDER BY d.designateddate DESC
+    LIMIT 100;
+  `, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.json([]);
+    } else {
+      console.log("Success");
+      res.json(data.rows);
+    }
+  });
+}
 
 const search_disasters = async function (req, res) {
   const disasterId = req.query.disaster_id;
@@ -453,5 +479,6 @@ module.exports = {
   getRecentDisasters,
   getMostRecentDisastersByState,
   search_properties,
+  get_disasters_for_property,
   search_disasters
 };

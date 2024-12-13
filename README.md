@@ -38,6 +38,10 @@ Then install @mui/x-data-grid
     
     npm install @mui/x-data-grid --legacy-peer-deps
 
+Then install @mui/icons-material
+
+    npm install @mui/icons-material --legacy-peer-deps
+
 Finally, start the client:
 
     npm start

@@ -50,7 +50,7 @@ export default function DisasterRisks() {
     { code: 'IA', description: 'Individual Assistance' },
     { code: 'IFG', description: 'Individual and Family Grant' },
     { code: 'IH', description: 'Individual Housing' },
-    { code: 'OTH', description: 'Over the Horizon' },
+    { code: 'OTH', description: 'Other' },
     { code: 'PA', description: 'Public Assistance' },
     { code: 'PA-A', description: 'Public Assistance - Debris Removal' },
     { code: 'PA-B', description: 'Public Assistance - Protective Measures' },

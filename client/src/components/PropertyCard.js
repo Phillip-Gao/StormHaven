@@ -1,42 +1,96 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Box, Button, Typography } from '@mui/material';
+import { Modal, Box, Button, Typography, IconButton } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import { DataGrid } from '@mui/x-data-grid';
 import config from './config.json';
+import { formatDate, formatStatus } from '../helpers/formatter';
 
 export default function PropertyCard({ propertyId, handleClose }) {
   const [propertyData, setPropertyData] = useState({});
+  const [disasters, setDisasters] = useState([]);
 
   useEffect(() => {
+    // Fetch property details
     if (propertyId) {
-      // Fetch the specific property by its ID
       fetch(`http://${config.server_host}:${config.server_port}/search_properties?property_id=${propertyId}`)
         .then(res => res.json())
         .then(data => {
-          // Since the endpoint should return a single property detail, 
-          // we expect data to be an array with one object
           if (data && data.length > 0) {
-            setPropertyData(data[0]); // Set the first item of the array to state
+            setPropertyData(data[0]); 
           }
         })
         .catch(err => console.error('Error fetching property data:', err));
+
+      // Fetch disasters associated with the property
+      fetch(`http://${config.server_host}:${config.server_port}/get_disasters_for_property?property_id=${propertyId}`)
+        .then(res => res.json())
+        .then(resJson => {
+          const disastersWithId = resJson.map(disaster => ({ id: disaster.disaster_id, ...disaster }));
+          setDisasters(disastersWithId);
+          })
+        .catch(err => console.error('Error fetching disaster data:', err));
     }
   }, [propertyId]);
+
+  const columns = [
+    { field: 'disaster_id', headerName: 'Disaster ID', width: 150 },
+    { field: 'disasternumber', headerName: "Disaster Number", width: 150 },
+	  { field: 'type_code', headerName: "Type Code", width: 150 },
+    { field: 'designateddate', headerName: 'Designated Date', width: 150, valueGetter: (value) => {return formatDate(value)}, },
+	  { field: 'type_description', headerName: 'Description', width: 300}
+  ];
+
+  const num_disasters = () => {
+    if (disasters !== 'undefined' && disasters != null) {
+      return disasters.length;
+    }
+    return 0
+  }
+
+  const most_recent_disaster = () => {
+    if (disasters !== 'undefined' && disasters != null) {
+      if (disasters[0] !== 'undefined' && disasters[0]  != null) {
+        return formatDate(disasters[0].designateddate);
+      }
+    }
+    return 'N/A'
+  }
 
   return (
     <Modal
       open={true}
       onClose={handleClose}
-      style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
     >
       <Box
-        p={3}
-        bgcolor="background.paper"
-        borderRadius={2}
-        border="2px solid #000"
-        width={600}
+        sx={{
+          p: 3,
+          bgcolor: 'background.paper',
+          borderRadius: 2,
+          border: '2px solid #000',
+          width: 1000,
+          height: 1250,
+          overflow: 'auto'
+        }}
       >
-        <Typography variant="h4" component="h1" gutterBottom>
-          {'Property Details'}
-        </Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <Typography variant="h4" component="h1" gutterBottom>
+            Property Details
+          </Typography>
+          <IconButton
+            aria-label="close"
+            onClick={handleClose}
+            sx={{ ml: 'auto' }} 
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
         <Typography variant="h6">
           Price: ${propertyData.price || 'N/A'}
         </Typography>
@@ -52,15 +106,26 @@ export default function PropertyCard({ propertyId, handleClose }) {
         <Typography variant="h6">
           Acres: {propertyData.acre_lot || 'N/A'}
         </Typography>
-        <Typography variant="h6">
-          Status: {propertyData.status || 'N/A'}
+        <Typography variant="h6" gutterBottom>
+          Status: {formatStatus(propertyData.status) || 'N/A'}
         </Typography>
         <Typography variant="h4" component="h1" gutterBottom>
-          {'Disaster Details'}
+          Disaster Details
         </Typography>
-        <Button onClick={handleClose} sx={{ mt: 2 }}>
-          Close
-        </Button>
+        <Typography variant="h6">
+          Total Disasters: {num_disasters()}
+        </Typography>
+        <Typography variant="h6" gutterBottom>
+          Last Disaster: {most_recent_disaster()}
+        </Typography>
+        <DataGrid
+          rows={disasters}
+          columns={columns}
+          pageSize={5}
+          rowsPerPageOptions={[5]}
+          autoHeight
+          disableSelectionOnClick
+        />
       </Box>
     </Modal>
   );

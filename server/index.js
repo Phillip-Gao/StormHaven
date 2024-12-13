@@ -9,10 +9,6 @@ app.use(cors({
   origin: '*',
 }));
 
-app.get('/', (req, res) => {
-  res.redirect('/search_disasters');
-});
-
 // app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
 // app.use(bodyParser.json());
 // app.use(bodyParser.urlencoded({ extended: false }));
@@ -24,7 +20,7 @@ app.get('/', (req, res) => {
 /* ---- (Dashboard) ---- */
 
 // // Query 1: Find the most frequent disaster types in locations where the average property price exceeds $500,000 SET
-app.get('/frequent-disaster-high-price-properties', routes.getFrequentDisasterHighPriceProperties);
+// app.get('/frequent-disaster-high-price-properties', routes.getFrequentDisasterHighPriceProperties);
 
 // // Query 2: List properties with no disasters in the past 5 years in high-risk disaster areas SET
 // app.get('/recently-unimpacted-high-risk-areas', routes.getRecentlyUnimpactedHighRiskAreas);
@@ -39,7 +35,7 @@ app.get('/frequent-disaster-high-price-properties', routes.getFrequentDisasterHi
 // app.get('/top-affected-areas', routes.getTopAffectedAreas);
 
 // // Query 6: Identifies properties affected by the highest number of disaster events SET
-app.get('/most-affected-properties', routes.getMostAffectedProperties);
+// app.get('/most-affected-properties', routes.getMostAffectedProperties);
 
 // // Query 7: Finds properties in frequent disaster areas and under a price threshold
 // app.get('/frequent-disaster-properties', routes.getFrequentDisasterProperties);
@@ -67,6 +63,7 @@ app.get('/most-affected-properties', routes.getMostAffectedProperties);
 
 /* ---- (FindHouses) ---- */
 app.get('/search_properties', routes.search_properties);
+app.get('/get_disasters_for_property', routes.get_disasters_for_property);
 
 /* ---- (DisasterRisks) ---- */
 app.get('/search_disasters', routes.search_disasters);

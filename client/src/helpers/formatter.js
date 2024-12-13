@@ -1,6 +1,9 @@
 export function formatDate(date) {
-  const dateObj = new Date(Date.parse(date.substring(0, 10)));
-  return dateObj.toLocaleString("en-US", { month: "long", day: "numeric", year: "numeric" });
+  if (date !== 'undefined' && date != null) {
+    const dateObj = new Date(Date.parse(date.substring(0, 10)));
+    return dateObj.toLocaleString("en-US", { month: "long", day: "numeric", year: "numeric" });
+  }
+  return date;
 }
 
 export function exportDate(date, max) {
@@ -13,5 +16,8 @@ export function exportDate(date, max) {
 }
 
 export function formatStatus(status) {
-  return status.replace("_", " ")
+  if (status !== 'undefined' && status != null) {
+    return status.replace("_", " ")
+  }
+  return status
 }
