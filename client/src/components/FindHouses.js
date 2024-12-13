@@ -6,10 +6,12 @@ import PageNavbar from './PageNavbar';
 import config from './config.json';
 import { favorites, addFavorite, removeFavorite } from './Favorites';
 import { formatStatus } from '../helpers/formatter';
+import PropertyCard from './PropertyCard'; 
 
 export default function FindHouses() {
   const [pageSize, setPageSize] = useState(10);
   const [data, setData] = useState([]);
+  const [selectedPropertyId, setSelectedPropertyId] = useState(null);
  
   const [propertyId, setPropertyId] = useState('');
   const [countyName, setCountyName] = useState('');
@@ -41,6 +43,7 @@ export default function FindHouses() {
       isFavorite: favorites.some(fav => fav.id === property.id),
     })));
   };
+  
 
   const search = () => {
     const query = `http://${config.server_host}:${config.server_port}/search_properties?` +
@@ -70,7 +73,9 @@ export default function FindHouses() {
   }
 
   const columns = [
-    { field: 'property_id', headerName: 'Property ID', width: 150 },
+    { field: 'property_id', headerName: 'Property ID', width: 150, renderCell: (params) => (
+      <Button onClick={() => setSelectedPropertyId(params.id)}>{params.value}</Button>
+    ) },
     { field: 'county_name', headerName: 'City', width: 150 },
 	  { field: 'state', headerName: "State", width: 150 },
     { field: 'price', headerName: 'Price', width: 150 },
@@ -94,6 +99,7 @@ export default function FindHouses() {
 
   return (
     <Container>
+      {selectedPropertyId && <PropertyCard propertyId={selectedPropertyId} handleClose={() => setSelectedPropertyId(null)} />}   
       <PageNavbar active='FindHouses' />
       <h2>Search Properties</h2>
       <Grid container spacing={2}>
