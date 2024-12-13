@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { Container } from '@mui/material';
 import '../style/Dashboard.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import PageNavbar from './PageNavbar';
 import config from './config.json'; // Ensure you have this if you're using it
 
 export default function Dashboard(props) {
+	const [pageSize, setPageSize] = useState(10);
     const [overviewDisasters, setOverviewDisasters] = useState([]);
     const [isLoadingOverview, setIsLoadingOverview] = useState(false);
     const [hasErrorOverview, setHasErrorOverview] = useState(false);
@@ -112,9 +114,9 @@ export default function Dashboard(props) {
     };
 
     return (
-        <div className="Dashboard">
+        <Container>
             <PageNavbar active="Dashboard" />
-            <div className="container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div className="container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
                 <br />
 				<div className="introduction">
                     <h1>Welcome to StormHaven!</h1>
@@ -237,7 +239,7 @@ export default function Dashboard(props) {
                     )}
                 </div>
             </div>
-        </div>
+		</Container>
     );
 }
 
