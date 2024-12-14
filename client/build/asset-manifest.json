@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "/storm-haven/static/css/main.1522af68.css",
+    "main.js": "/storm-haven/static/js/main.063d14e8.js",
+    "static/media/logo.png": "/storm-haven/static/media/logo.c80725a90e81b71f052f.png",
+    "index.html": "/storm-haven/index.html",
+    "main.1522af68.css.map": "/storm-haven/static/css/main.1522af68.css.map",
+    "main.063d14e8.js.map": "/storm-haven/static/js/main.063d14e8.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.1522af68.css",
+    "static/js/main.063d14e8.js"
+  ]
+}
