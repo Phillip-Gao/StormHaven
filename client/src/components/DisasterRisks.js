@@ -91,11 +91,11 @@ export default function DisasterRisks() {
   }
 
   const columns = [
-    { field: 'disaster_id', headerName: 'Disaster ID', width: 100 },
-    { field: 'disasternumber', headerName: "Disaster Number", width: 100 },
-	  { field: 'type_code', headerName: "Type Code", width: 100 },
-    { field: 'county_name', headerName: 'City', width: 150 },
-    { field: 'designateddate', headerName: 'Designated Date', width: 150, valueGetter: (value) => {return formatDate(value)}, },
+    { field: 'disaster_id', headerName: 'Disaster ID', width: 150 },
+    { field: 'disasternumber', headerName: "Disaster Number", width: 150 },
+	  { field: 'type_code', headerName: "Type Code", width: 150 },
+    { field: 'county_name', headerName: 'City', width: 200 },
+    { field: 'designateddate', headerName: 'Designated Date', width: 200, valueGetter: (value) => {return formatDate(value)}, },
     // { field: 'entrydate', headerName: 'Entry Date', width: 150, valueGetter: (value) => {return formatDate(value)},  },
     // { field: 'closeoutdate', headerName: 'Closeout Date', width: 150, valueGetter: (value) => {return formatDate(value)}, },
 	{ field: 'type_description', headerName: 'Description', width: 300}

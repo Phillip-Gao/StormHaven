@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container } from '@mui/material';
+import { Container, Box } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import '../style/Dashboard.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -265,15 +265,15 @@ export default function Dashboard(props) {
 				) : null}
 				{showAnalytics[0] && (
 					<DataGrid
-					rows={analyticsDisasters}
-					columns={[
-						{ field: 'type_code', headerName: 'Disaster Type', width: 500 },
-						{ field: 'disaster_count', headerName: 'Disaster Count', width: 500 }
-					]}
-					pageSize={5}
-					rowsPerPageOptions={[5, 10, 25]}
-					autoHeight
-					getRowId={(row) => row.type_code}
+						rows={analyticsDisasters}
+						columns={[
+							{ field: 'type_code', headerName: 'Disaster Type', width: 400 },
+							{ field: 'disaster_count', headerName: 'Disaster Count', width: 400 }
+						]}
+						pageSize={5}
+						rowsPerPageOptions={[5, 10, 25]}
+						autoHeight
+						getRowId={(row) => row.type_code}
 					/>
 				)}
 				{showAnalytics[1] && (
@@ -304,6 +304,7 @@ export default function Dashboard(props) {
 					rowsPerPageOptions={[5, 10, 25]}
 					autoHeight
 					getRowId={(row) => row.row_index}
+
 				/>
 				)}
 			</div>
