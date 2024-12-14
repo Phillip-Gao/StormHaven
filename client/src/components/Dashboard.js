@@ -255,7 +255,7 @@ export default function Dashboard(props) {
 						onClick={() => fetchAnalyticsData(2)}
 						style={{ marginBottom: '10px' }}
 					>
-						Properties with Significant Disaster Types
+						Prices for properties commonly affected by disasters
 					</button>
 				</div>
 				{isLoadingAnalytics ? (
