@@ -29,7 +29,7 @@ app.use(cors({
 app.get('/safest-cities-per-state', routes.getSafestCitiesPerState);
 
 // // Query 4: Retrieve properties affected by all disaster types in their area SET
-// app.get('/properties-with-all-disasters', routes.getPropertiesWithAllDisasters);
+app.get('/properties-with-significant-disasters', routes.getPropertiesWithSignificantDisasterType);
 
 // // Query 5: Lists areas with the highest number of properties affected by disasters
 // app.get('/top-affected-areas', routes.getTopAffectedAreas);

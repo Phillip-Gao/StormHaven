@@ -23,13 +23,13 @@ connection.connect((err) => err && console.log(err));
 // average property price exceeds $500,000, grouped by type_code.
 // Complex Query 1 (For Analytics in Dashboard)
 const getFrequentDisasterHighPriceProperties = async function (req, res) {
-  const query = `
+  connection.query(`
     WITH High_Priced_Locations AS (
-        SELECT l.city, l.state, p.property_id
-        FROM Located l
-        JOIN Property p ON l.property_id = p.property_id
-        GROUP BY l.city, l.state, p.property_id
-        HAVING AVG(p.price) > 500000
+      SELECT l.city, l.state, p.property_id
+      FROM Located l
+      JOIN Property p ON l.property_id = p.property_id
+      GROUP BY l.city, l.state, p.property_id
+      HAVING AVG(p.price) > 500000
     ),
     Disaster_Frequency AS (
         SELECT dt.type_code, COUNT(d.disaster_id) AS disaster_count
@@ -43,15 +43,15 @@ const getFrequentDisasterHighPriceProperties = async function (req, res) {
     FROM Disaster_Frequency
     ORDER BY disaster_count DESC
     LIMIT 10;
-  `;
-
-  try {
-    const { rows } = await connection.query(query);
-    res.json(rows); // Send the rows as JSON response directly
-  } catch (err) {
-    console.error('SQL Error: ', err);
-    res.status(500).json({ error: 'Internal server error' }); // Send JSON formatted error message
-  }
+  `, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.json([])
+    } else {
+      console.log("Success");
+      res.json(data.rows);
+    }
+  });
 };
 
 // Query 2: List properties that have no disasters recorded in the past 5 years but 
@@ -59,24 +59,24 @@ const getFrequentDisasterHighPriceProperties = async function (req, res) {
 // Complex Query 2 (For Overview in  Dashboard)
 function getRecentlyUnimpactedHighRiskAreas(req, res) {
   var query = `
-WITH Recent_Disasters AS (
-  SELECT DISTINCT l.property_id
-  FROM Located l
-  JOIN Disaster d ON l.disaster_id = d.disaster_id
-  WHERE d.designateddate >= CURRENT_DATE - INTERVAL '5 YEARS'
-),
-High_Risk_Areas AS (
-    SELECT DISTINCT l.city, l.state
-    FROM Located l
-    JOIN Disaster_Types dt ON l.disaster_id = dt.disaster_id
-    WHERE dt.type_code = 'HM'
-)
-SELECT p.property_id, l.city, l.state
-FROM Property p
-JOIN Located l ON p.property_id = l.property_id
-WHERE (l.city, l.state) IN (SELECT city, state FROM High_Risk_Areas)
-  AND p.property_id NOT IN (SELECT property_id FROM Recent_Disasters)
-  LIMIT 100;
+    WITH Recent_Disasters AS (
+      SELECT DISTINCT l.property_id
+      FROM Located l
+      JOIN Disaster d ON l.disaster_id = d.disaster_id
+      WHERE d.designateddate >= CURRENT_DATE - INTERVAL '5 YEARS'
+    ),
+    High_Risk_Areas AS (
+        SELECT DISTINCT l.city, l.state
+        FROM Located l
+        JOIN Disaster_Types dt ON l.disaster_id = dt.disaster_id
+        WHERE dt.type_code = 'HM'
+    )
+    SELECT p.property_id, l.city, l.state
+    FROM Property p
+    JOIN Located l ON p.property_id = l.property_id
+    WHERE (l.city, l.state) IN (SELECT city, state FROM High_Risk_Areas)
+    AND p.property_id NOT IN (SELECT property_id FROM Recent_Disasters)
+    LIMIT 100;
    `;
   connection.query(query, function(err, rows, fields) {
     if (err) console.log(err);
@@ -89,25 +89,17 @@ WHERE (l.city, l.state) IN (SELECT city, state FROM High_Risk_Areas)
 function getSafestCitiesPerState(req, res) {
   connection.query(`
   WITH CityDisasters AS (
-    SELECT 
-        l.county_name,
-        l.state,
-        COUNT(*) AS disaster_count
+    SELECT l.county_name, l.state, COUNT(*) AS disaster_count
     FROM public.located l
     JOIN public.disaster d ON l.disaster_id = d.disaster_id
     GROUP BY l.county_name, l.state
   ),
   StateAverages AS (
-    SELECT 
-        state,
-        SUM(disaster_count) / COUNT(county_name) AS avg_disasters_per_city
+    SELECT state, SUM(disaster_count) / COUNT(county_name) AS avg_disasters_per_city
     FROM CityDisasters
     GROUP BY state
   )
-    SELECT 
-        cd.county_name,
-        cd.state,
-        cd.disaster_count
+    SELECT ROW_NUMBER() OVER (ORDER BY cd.disaster_count ASC) AS row_index, cd.county_name, cd.state, cd.disaster_count
     FROM CityDisasters cd
     JOIN StateAverages sa ON cd.state = sa.state
     WHERE cd.disaster_count <= sa.avg_disasters_per_city
@@ -115,7 +107,7 @@ function getSafestCitiesPerState(req, res) {
   `, (err, data) => {
     if (err) {
       console.log(err);
-      res.json([]);
+      res.json([])
     } else {
       console.log("Success");
       res.json(data.rows);
@@ -123,43 +115,43 @@ function getSafestCitiesPerState(req, res) {
   });
 }
 
-// Query 4: Retrieve properties that have been affected by all disaster types in their respective city and state.
-function getPropertiesWithAllDisasters(req, res) {
+// Query 4:  Retrieves statistical information about properties located in cities and states affected 
+// by at least two different types of disasters
+function getPropertiesWithSignificantDisasterType(req, res) {
   var query = `
-    WITH Disaster_Types_Per_Location AS (
-        SELECT l.city, l.state, dt.type_code
-        FROM Disaster d
-        JOIN Disaster_Types dt ON d.disaster_id = dt.disaster_id
-        JOIN Located l ON d.disaster_id = l.disaster_id
-        GROUP BY l.city, l.state, dt.type_code
-    ),
-    Property_Disaster_Types AS (
-        SELECT l.city, l.state, p.property_id, dt.type_code
-        FROM Property p
-        JOIN Located l ON p.property_id = l.property_id
-        JOIN Disaster d ON l.disaster_id = d.disaster_id
-        JOIN Disaster_Types dt ON d.disaster_id = dt.disaster_id
-    ),
-    All_Disaster_Types_Check AS (
-        SELECT pd.property_id
-        FROM Property_Disaster_Types pd
-        GROUP BY pd.property_id, pd.city, pd.state
-        HAVING COUNT(DISTINCT pd.type_code) = (
-            SELECT COUNT(DISTINCT d.type_code)
-            FROM Disaster_Types_Per_Location d
-            WHERE d.city = pd.city AND d.state = pd.state
-        )
+    WITH CityDisasterCounts AS (
+      SELECT 
+          l.city,
+          l.state,
+          COUNT(DISTINCT dt.type_code) AS num_disaster_types
+      FROM Located l
+      JOIN Disaster d ON l.disaster_id = d.disaster_id
+      JOIN Disaster_Types dt ON d.disaster_id = dt.disaster_id
+      GROUP BY l.city, l.state
+      HAVING COUNT(DISTINCT dt.type_code) >= 2
     )
-    SELECT DISTINCT p.property_id, l.city, l.state
-    FROM Property p
-    JOIN Located l ON p.property_id = l.property_id
-    WHERE p.property_id IN (SELECT property_id FROM All_Disaster_Types_Check);
-  `;
+      SELECT 
+          ROW_NUMBER() OVER (ORDER BY AVG(p.price)::numeric DESC) AS row_index,
+          cdc.city,
+          cdc.state,
+          ROUND(AVG(p.price)::numeric, 2) AS average_price
+      FROM Property p
+      JOIN Located l ON p.property_id = l.property_id
+      JOIN CityDisasterCounts cdc ON l.city = cdc.city AND l.state = cdc.state
+      GROUP BY cdc.city, cdc.state
+      ORDER BY average_price DESC;
+    `;
   connection.query(query, function(err, rows, fields) {
-    if (err) console.log(err);
-    else res.json(rows);
+    if (err) {
+      console.log(err);
+      res.json([])
+    } else {
+      console.log("Success");
+      res.json(data.rows);
+    }
   });
 }
+
 
 // Query 5: Lists areas with the highest number of properties affected by disasters
 function getTopAffectedAreas(req, res) {
@@ -486,7 +478,7 @@ module.exports = {
   getFrequentDisasterHighPriceProperties,
   getRecentlyUnimpactedHighRiskAreas,
   getSafestCitiesPerState,
-  getPropertiesWithAllDisasters,
+  getPropertiesWithSignificantDisasterType,
   getTopAffectedAreas,
   getMostAffectedProperties,
   getFrequentDisasterProperties,
