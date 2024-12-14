@@ -84,35 +84,45 @@ WHERE (l.city, l.state) IN (SELECT city, state FROM High_Risk_Areas)
   });
 }
 
-// Query 3: Retrieve properties that have been impacted by fewer disasters than the 
-// average number of disasters per property in their location, showing property_id, city, and state.
-function getSafestPropertiesInHighRiskAreas(req, res) {
-  var query = `
-    WITH Average_Disaster_Count_Per_Location AS (
-      SELECT l.city, l.state, AVG(disaster_count) AS avg_disasters
-      FROM (
-          SELECT l.city, l.state, p.property_id, COUNT(pd.disaster_id) AS disaster_count
-          FROM Property p
-          JOIN Property_Disaster pd ON p.property_id = pd.property_id
-          JOIN Located l ON p.property_id = l.property_id
-          GROUP BY l.city, l.state, p.property_id
-      ) Property_Disaster_Count
-      GROUP BY l.city, l.state
-    )
-    SELECT p.property_id, l.city, l.state
-    FROM Property p
-    JOIN Property_Disaster pd ON p.property_id = pd.property_id
-    JOIN Located l ON p.property_id = l.property_id
-    GROUP BY p.property_id, l.city, l.state
-    HAVING COUNT(pd.disaster_id) < (
-      SELECT avg_disasters
-      FROM Average_Disaster_Count_Per_Location avg_loc
-      WHERE avg_loc.city = l.city AND avg_loc.state = l.state
-    );
-  `;
-  connection.query(query, function(err, rows, fields) {
-    if (err) console.log(err);
-    else res.json(rows);
+// Query 3: Retrieve cities that have been impacted by fewer disasters than the 
+// average number of disasters per city in their state, showing property_id, city, and state.
+function getSafestPropertiesPerState(req, res) {
+  connection.query(`
+  WITH CityDisasters AS (
+    SELECT 
+        l.county_name,
+        l.state,
+        COUNT(*) AS disaster_count
+    FROM public.located l
+    JOIN public.disaster d ON l.disaster_id = d.disaster_id
+    GROUP BY l.county_name, l.state
+    LIMIT 1000
+  ),
+  StateAverages AS (
+    SELECT 
+        state,
+        SUM(disaster_count) / COUNT(county_name) AS avg_disasters_per_city
+    FROM CityDisasters
+    GROUP BY state
+    LIMIT 50
+  )
+    SELECT 
+        cd.county_name,
+        cd.state,
+        cd.disaster_count
+    FROM CityDisasters cd
+    JOIN StateAverages sa ON cd.state = sa.state
+    WHERE cd.disaster_count <= sa.avg_disasters_per_city
+    ORDER BY cd.disaster_count ASC
+    LIMIT 1000;
+  `, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.json([]);
+    } else {
+      console.log("Success");
+      res.json(data.rows);
+    }
   });
 }
 
@@ -478,7 +488,7 @@ const search_disasters = async function (req, res) {
 module.exports = {
   getFrequentDisasterHighPriceProperties,
   getRecentlyUnimpactedHighRiskAreas,
-  getSafestPropertiesInHighRiskAreas,
+  getSafestPropertiesPerState,
   getPropertiesWithAllDisasters,
   getTopAffectedAreas,
   getMostAffectedProperties,

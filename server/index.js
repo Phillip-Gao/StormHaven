@@ -26,7 +26,7 @@ app.use(cors({
  app.get('/recently-unimpacted-high-risk-areas', routes.getRecentlyUnimpactedHighRiskAreas);
 
 // // Query 3: Retrieve properties with fewer disasters than the average in their location
-// app.get('/safest-properties-in-high-risk-areas', routes.getSafestPropertiesInHighRiskAreas);
+app.get('/safest-properties-per-state', routes.getSafestPropertiesPerState);
 
 // // Query 4: Retrieve properties affected by all disaster types in their area SET
 // app.get('/properties-with-all-disasters', routes.getPropertiesWithAllDisasters);
