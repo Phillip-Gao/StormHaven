@@ -118,7 +118,7 @@ function getSafestCitiesPerState(req, res) {
 // Query 4:  Retrieves statistical information about properties located in cities and states affected 
 // by at least two different types of disasters
 function getPropertiesWithSignificantDisasterType(req, res) {
-  var query = `
+  connection.query(`
     WITH CityDisasterCounts AS (
       SELECT 
           l.city,
@@ -140,8 +140,7 @@ function getPropertiesWithSignificantDisasterType(req, res) {
       JOIN CityDisasterCounts cdc ON l.city = cdc.city AND l.state = cdc.state
       GROUP BY cdc.city, cdc.state
       ORDER BY average_price DESC;
-    `;
-  connection.query(query, function(err, rows, fields) {
+  `, (err, data) => {
     if (err) {
       console.log(err);
       res.json([])

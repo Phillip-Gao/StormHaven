@@ -23,6 +23,7 @@ export default function Dashboard(props) {
     const [hasErrorMostAffected, setHasErrorMostAffected] = useState(false);
 
 	const [safestProperties, setSafestProperties] = useState([]);
+	const [propertiesWithSignificantDisasters, setPropertiesWithSignificantDisasters] = useState([]);
     const [isLoadingSafestProperties, setIsLoadingSafestProperties] = useState(false);
     const [hasErrorSafestProperties, setHasErrorSafestProperties] = useState(false);
 
@@ -87,8 +88,8 @@ export default function Dashboard(props) {
 	const fetchAnalyticsData = (index) => {
 		// Reset all analytics states except the clicked one
 		const updatedShowAnalytics = [false, false, false];
-		updatedShowAnalytics[index] = !showAnalytics[index];
-		setShowAnalytics(updatedShowAnalytics);
+   		updatedShowAnalytics[index] = !showAnalytics[index];
+    	setShowAnalytics(updatedShowAnalytics);
 	
 		// Clear data if the same button is clicked again to close it
 		if (showAnalytics[index]) {
@@ -117,21 +118,23 @@ export default function Dashboard(props) {
 		}
 	
 		fetch(`http://${config.server_host}:${config.server_port}${endpoint}`)
-			.then(response => {
-				if (!response.ok) {
-					throw new Error('Network response was not ok');
-				}
-				return response.json();
-			})
-			.then(data => {
-				setAnalyticsDisasters(data || []);
-				setIsLoadingAnalytics(false);
-			})
-			.catch(error => {
-				console.error('Error fetching data:', error);
-				setHasErrorAnalytics(true);
-				setIsLoadingAnalytics(false);
-			});
+            .then(response => response.json())
+            .then(data => {
+				if (index === 0) {
+					setAnalyticsDisasters(data || []);
+                } else if (index === 1) {
+                    setSafestProperties(data || []);
+                } else {
+                    setPropertiesWithSignificantDisasters(data || []);
+                }
+                setShowAnalytics(showAnalytics.map((v, i) => i === index)); // Update visibility for the current grid
+                setIsLoadingAnalytics(false);
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                setHasErrorAnalytics(true);
+                setIsLoadingAnalytics(false);
+            });
 	};
 
     return (
@@ -238,21 +241,21 @@ export default function Dashboard(props) {
 						onClick={() => fetchAnalyticsData(0)}
 						style={{ marginBottom: '10px' }}
 					>
-						Safest Cities per State
+						Frequent Disasters for High Price Properties
 					</button>
 					<button
 						className="btn btn-primary"
 						onClick={() => fetchAnalyticsData(1)}
 						style={{ marginBottom: '10px' }}
 					>
-						Properties with Significant Disaster Types
+						Safest Cities per State
 					</button>
 					<button
 						className="btn btn-primary"
 						onClick={() => fetchAnalyticsData(2)}
 						style={{ marginBottom: '10px' }}
 					>
-						Frequent Disasters for High Price Properties
+						Properties with Significant Disaster Types
 					</button>
 				</div>
 				{isLoadingAnalytics ? (
@@ -262,41 +265,46 @@ export default function Dashboard(props) {
 				) : null}
 				{showAnalytics[0] && (
 					<DataGrid
-						rows={analyticsDisasters}
-						columns={[
-							{ field: 'county_name', headerName: 'City', width: 200 },
-							{ field: 'state', headerName: 'State', width: 200 },
-							{ field: 'disaster_count', headerName: 'Disaster Count', width: 150 }
-						]}
-						pageSize={10}
-						rowsPerPageOptions={[5, 10, 25]}
-						autoHeight
+					rows={analyticsDisasters}
+					columns={[
+						{ field: 'type_code', headerName: 'Disaster Type', width: 500 },
+						{ field: 'disaster_count', headerName: 'Disaster Count', width: 500 }
+					]}
+					pageSize={5}
+					rowsPerPageOptions={[5, 10, 25]}
+					autoHeight
+					getRowId={(row) => row.type_code}
 					/>
 				)}
 				{showAnalytics[1] && (
 					<DataGrid
-						rows={analyticsDisasters}
-						columns={[
-							{ field: 'city', headerName: 'City', width: 200 },
-							{ field: 'state', headerName: 'State', width: 200 },
-							{ field: 'average_price', headerName: 'Average Price', width: 200, type: 'number' }
-						]}
-						pageSize={10}
-						rowsPerPageOptions={[5, 10, 25]}
-						autoHeight
-					/>
+					rows={safestProperties}
+					columns={[
+						{ field: 'row_index', headerName: 'Index', width: 200, hide: true },
+						{ field: 'county_name', headerName: 'City', width: 300 },
+						{ field: 'state', headerName: 'State', width: 300 },
+						{ field: 'disaster_count', headerName: 'Disaster Count', width: 200 }
+					]}
+					pageSize={10}
+					rowsPerPageOptions={[5, 10, 25]}
+					autoHeight
+					getRowId={(row) => row.row_index}
+				/>
 				)}
 				{showAnalytics[2] && (
 					<DataGrid
-						rows={analyticsDisasters}
-						columns={[
-							{ field: 'type_code', headerName: 'Disaster Type', width: 150 },
-							{ field: 'disaster_count', headerName: 'Disaster Count', width: 150 }
-						]}
-						pageSize={10}
-						rowsPerPageOptions={[5, 10, 25]}
-						autoHeight
-					/>
+					rows={propertiesWithSignificantDisasters}
+					columns={[
+						{ field: 'row_index', headerName: 'Index', width: 200 },
+						{ field: 'city', headerName: 'City', width: 300 },
+						{ field: 'state', headerName: 'State', width: 300 },
+						{ field: 'average_price', headerName: 'Average Price', width: 200 }
+					]}
+					pageSize={10}
+					rowsPerPageOptions={[5, 10, 25]}
+					autoHeight
+					getRowId={(row) => row.row_index}
+				/>
 				)}
 			</div>
 
