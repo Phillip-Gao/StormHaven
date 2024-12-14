@@ -86,7 +86,7 @@ WHERE (l.city, l.state) IN (SELECT city, state FROM High_Risk_Areas)
 
 // Query 3: Retrieve cities that have been impacted by fewer disasters than the 
 // average number of disasters per city in their state, showing property_id, city, and state.
-function getSafestPropertiesPerState(req, res) {
+function getSafestCitiesPerState(req, res) {
   connection.query(`
   WITH CityDisasters AS (
     SELECT 
@@ -96,7 +96,6 @@ function getSafestPropertiesPerState(req, res) {
     FROM public.located l
     JOIN public.disaster d ON l.disaster_id = d.disaster_id
     GROUP BY l.county_name, l.state
-    LIMIT 1000
   ),
   StateAverages AS (
     SELECT 
@@ -104,7 +103,6 @@ function getSafestPropertiesPerState(req, res) {
         SUM(disaster_count) / COUNT(county_name) AS avg_disasters_per_city
     FROM CityDisasters
     GROUP BY state
-    LIMIT 50
   )
     SELECT 
         cd.county_name,
@@ -113,8 +111,7 @@ function getSafestPropertiesPerState(req, res) {
     FROM CityDisasters cd
     JOIN StateAverages sa ON cd.state = sa.state
     WHERE cd.disaster_count <= sa.avg_disasters_per_city
-    ORDER BY cd.disaster_count ASC
-    LIMIT 1000;
+    ORDER BY cd.disaster_count ASC;
   `, (err, data) => {
     if (err) {
       console.log(err);
@@ -488,7 +485,7 @@ const search_disasters = async function (req, res) {
 module.exports = {
   getFrequentDisasterHighPriceProperties,
   getRecentlyUnimpactedHighRiskAreas,
-  getSafestPropertiesPerState,
+  getSafestCitiesPerState,
   getPropertiesWithAllDisasters,
   getTopAffectedAreas,
   getMostAffectedProperties,

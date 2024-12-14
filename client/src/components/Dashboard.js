@@ -85,14 +85,8 @@ export default function Dashboard(props) {
     };
 
     const fetchAnalyticsData = (index) => {
-        const updatedShowAnalytics = [...showAnalytics];
-        if (updatedShowAnalytics[index] || isLoadingAnalytics) {
-            setAnalyticsDisasters([]);
-            updatedShowAnalytics[index] = false;
-            setShowAnalytics(updatedShowAnalytics);
-            setIsLoadingAnalytics(false);
-            return;
-        }
+		const updatedShowAnalytics = showAnalytics.map((_, i) => i === index);
+        setShowAnalytics(updatedShowAnalytics);
 
 		if (showAnalytics[index]) {
             if (index === 1) {
@@ -112,7 +106,7 @@ export default function Dashboard(props) {
 
 		const endpoint =
 		index === 1
-			? "/safest-properties-per-state"
+			? "/safest-cities-per-state"
 			: index === 2
 			? "/frequent-disaster-high-price-properties"
 			: "/most-affected-properties";
@@ -242,7 +236,6 @@ export default function Dashboard(props) {
 						</div>
 					)}
                 	</div>
-
                 <br />
 
                 {/* Analytics Section */}
