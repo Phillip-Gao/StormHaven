@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Container, List, ListItem, Typography, Button, TextField } from '@mui/material';
-import FindHouses from './FindHouses';
-import { createTheme } from '@mui/material/styles';
+import { Grid, Container, Typography, Button, TextField } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import PageNavbar from './PageNavbar';
 import config from './config.json';
 import { formatStatus } from '../helpers/formatter';
-import PropertyCard from './PropertyCard'; 
+import PropertyCard from './PropertyCard';
 
+// Retrieve favorites from localStorage or initialize an empty array
 export let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
 
+/**
+ * Adds a property to favorites with an optional note.
+ * Updates the localStorage to persist the data.
+ * @param {string} id - Property ID to add to favorites
+ */
 export function addFavorite(id) {
   if (!favorites.some(fav => fav.id === id)) {
     favorites.push({ id, note: '' });
@@ -17,11 +21,22 @@ export function addFavorite(id) {
   }
 }
 
+/**
+ * Removes a property from favorites by ID.
+ * Updates the localStorage to persist the data.
+ * @param {string} id - Property ID to remove from favorites
+ */
 export function removeFavorite(id) {
   favorites = favorites.filter(fav => fav.id !== id); 
   localStorage.setItem('favorites', JSON.stringify(favorites));
 }
 
+/**
+ * Updates the note for a property in favorites.
+ * Updates the localStorage to persist the data.
+ * @param {string} id - Property ID for which to update the note
+ * @param {string} note - Note content to save
+ */
 export function updateNote(id, note) {
   favorites = favorites.map(fav => (fav.id === id ? { ...fav, note } : fav));
   localStorage.setItem('favorites', JSON.stringify(favorites));
@@ -29,8 +44,11 @@ export function updateNote(id, note) {
 
 export default function Favorites() {
   const [data, setData] = useState([]);
+
+  // State to store property data
   const [selectedPropertyId, setSelectedPropertyId] = useState(null);
 
+  // Fetch detailed property data for all favorite properties
   useEffect(() => {
     const fetchFavorites = async () => {
       const promises = favorites.map(fav =>
@@ -48,11 +66,18 @@ export default function Favorites() {
     fetchFavorites();
   }, []);
 
+  // Remove a property from favorites and update the displayed data
   const handleRemove = (id) => {
     removeFavorite(id);
     setData(data.filter(property => property.id !== id));
   };
 
+  /**
+   * Adds or updates a note for a property.
+   * Updates local state and persists changes to localStorage.
+   * @param {string} id - Property ID
+   * @param {string} note - Note content to add or update
+   */
   const handleAddNote = (id, note) => {
     const updatedData = data.map(property => 
       property.id === id ? { ...property, note } : property
@@ -61,11 +86,13 @@ export default function Favorites() {
     localStorage.setItem('favorites', JSON.stringify(updatedData));
   };
 
+  // Update note for a property and persist it in state and localStorage
   const handleNoteChange = (id, note) => {
     updateNote(id, note);
     setData(data.map(property => (property.id === id ? { ...property, note } : property)));
   };
 
+  // DataGrid column definitions
   const columns = [
     { field: 'property_id', headerName: 'Property ID', width: 150, renderCell: (params) => (
       <Button onClick={() => setSelectedPropertyId(params.id)}>{params.value}</Button>

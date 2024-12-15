@@ -7,6 +7,7 @@ import Favorites from './Favorites';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { createTheme } from "@mui/material/styles";
 
+// Define custom MUI theme
 const theme = createTheme({
 	palette: {
 	  primary: {
@@ -18,14 +19,23 @@ const theme = createTheme({
 	},
   });
 
+// Global state for favorites
 export let favorites = [];
 
+/**
+ * Adds a house ID to the favorites array if not already included.
+ * @param {string} id - The unique identifier of a house.
+ */
 export function addFavorite (id) {
     if (!favorites.includes(id)) {
         favorites.push(id);
     }
 };
 
+/**
+ * Removes a house ID from the favorites array if it exists.
+ * @param {string} id - The unique identifier of a house.
+ */
 export function removeFavorite (id) {
     const index = favorites.indexOf(id);
     if (index > -1) {
@@ -33,6 +43,10 @@ export function removeFavorite (id) {
     }
 };
 
+/**
+ * Main application component with routing and theme provider.
+ * Provides routes for different pages.
+ */
 export default function App() {
 	return (
 		<div className="App">

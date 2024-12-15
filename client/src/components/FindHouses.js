@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Container, Grid, Slider, TextField, Link, Box, Checkbox } from '@mui/material';
-import { createTheme } from '@mui/material/styles';
+import { Button, Container, Grid, Slider, TextField, Box, Checkbox } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import PageNavbar from './PageNavbar';
 import config from './config.json';
 import { favorites, addFavorite, removeFavorite } from './Favorites';
 import { formatStatus } from '../helpers/formatter';
-import PropertyCard from './PropertyCard'; 
+import PropertyCard from './PropertyCard';
 
 export default function FindHouses() {
+  // State variables for data and filters
   const [pageSize, setPageSize] = useState(10);
   const [data, setData] = useState([]);
   const [selectedPropertyId, setSelectedPropertyId] = useState(null);
  
+  // Filters
   const [propertyId, setPropertyId] = useState('');
   const [countyName, setCountyName] = useState('');
   const [state, setState] = useState(''); 
@@ -22,6 +23,7 @@ export default function FindHouses() {
   const [bedrooms, setBedrooms] = useState([0, 20]);
   const [acres, setAcres] = useState([0, 5]);
   
+  // Fetch initial properties data
   useEffect(() => {
     fetch(`http://${config.server_host}:${config.server_port}/search_properties`)
       .then(res => res.json())
@@ -33,19 +35,21 @@ export default function FindHouses() {
       });
   }, []);
 
+  // Toggle favorite status for a property
   const handleFavoriteToggle = (id) => {
     if (favorites.some(fav => fav.id === id)) {
       removeFavorite(id);
     } else {
       addFavorite(id);
     }
+    // Update the data to reflect favorite changes
     setData(data.map(property => ({
       ...property,
       isFavorite: favorites.some(fav => fav.id === property.id),
     })));
   };
-  
 
+  // Search properties based on filters
   const search = () => {
     const query = `http://${config.server_host}:${config.server_port}/search_properties?` +
       `property_id=${propertyId}&county_name=${countyName}&state=${state}&status=${status}` +
@@ -62,6 +66,7 @@ export default function FindHouses() {
       });
   }
 
+  // Reset all filters to default values
   const resetFilters = () => {
     setPropertyId('');
     setCountyName('');
@@ -73,6 +78,7 @@ export default function FindHouses() {
     setAcres([0, 5]);
   }
 
+  // DataGrid column definitions
   const columns = [
     { field: 'property_id', headerName: 'Property ID', width: 150, renderCell: (params) => (
       <Button onClick={() => setSelectedPropertyId(params.id)}>{params.value}</Button>

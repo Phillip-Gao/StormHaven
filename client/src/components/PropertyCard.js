@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Box, Button, Typography, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { DataGrid } from '@mui/x-data-grid';
@@ -9,9 +9,10 @@ export default function PropertyCard({ propertyId, handleClose }) {
   const [propertyData, setPropertyData] = useState({});
   const [disasters, setDisasters] = useState([]);
 
+  // Fetch property details and associated disasters on propertyId change
   useEffect(() => {
-    // Fetch property details
     if (propertyId) {
+      // Fetch property details
       fetch(`http://${config.server_host}:${config.server_port}/search_properties?property_id=${propertyId}`)
         .then(res => res.json())
         .then(data => {
@@ -32,6 +33,7 @@ export default function PropertyCard({ propertyId, handleClose }) {
     }
   }, [propertyId]);
 
+  // Column definitions for the DataGrid
   const columns = [
     { field: 'disaster_id', headerName: 'Disaster ID', width: 150 },
     { field: 'disasternumber', headerName: "Disaster Number", width: 150 },
@@ -40,21 +42,25 @@ export default function PropertyCard({ propertyId, handleClose }) {
 	  { field: 'type_description', headerName: 'Description', width: 300}
   ];
 
-  const num_disasters = () => {
-    if (disasters !== 'undefined' && disasters != null) {
-      return disasters.length;
-    }
-    return 0
-  }
+  /**
+   * Get the total number of disasters.
+   * @returns {number} - Total disasters associated with the property.
+   */
+  const num_disasters = () => disasters.length;
 
+  /**
+   * Get the most recent disaster's date.
+   * @returns {string} - Formatted date of the most recent disaster or 'N/A'.
+   */
   const most_recent_disaster = () => {
-    if (disasters !== 'undefined' && disasters != null) {
-      if (disasters[0] !== 'undefined' && disasters[0]  != null) {
-        return formatDate(disasters[0].designateddate);
-      }
+    if (disasters.length > 0) {
+      const sortedDisasters = [...disasters].sort(
+        (a, b) => new Date(b.designateddate) - new Date(a.designateddate)
+      );
+      return formatDate(sortedDisasters[0].designateddate);
     }
-    return 'N/A'
-  }
+    return 'N/A';
+  };
 
   return (
     <Modal

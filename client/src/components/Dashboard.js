@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Box } from '@mui/material';
+import { Container } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import '../style/Dashboard.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import PageNavbar from './PageNavbar';
-import config from './config.json'; // Ensure you have this if you're using it
+import config from './config.json';
 
 export default function Dashboard(props) {
 	const [pageSize, setPageSize] = useState(10);
