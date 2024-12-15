@@ -98,16 +98,7 @@ function getPropertiesWithSignificantDisasterType(req, res) {
 // Part of Overview on Dashboard
 function getMostAffectedProperties(req, res) {
   var query = `
-      SELECT
-      l.city,
-      l.state,
-      l.county_name,
-      COUNT(DISTINCT l.property_id) AS affected_properties
-      FROM Located l
-      JOIN Disaster d ON l.disaster_id = d.disaster_id
-      GROUP BY l.city, l.state, l.county_name
-      ORDER BY affected_properties DESC
-      LIMIT 20;
+    SELECT * FROM mv_affected_properties;
   `;
   connection.query(query, function(err, rows, fields) {
     if (err) console.log(err);
