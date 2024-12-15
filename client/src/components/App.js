@@ -4,7 +4,7 @@ import Dashboard from './Dashboard';
 import FindHouses from './FindHouses';
 import DisasterRisks from './DisasterRisks';
 import Favorites from './Favorites';
-import { CssBaseline, ThemeProvider } from '@mui/material';
+import { ThemeProvider } from '@mui/material';
 import { createTheme } from "@mui/material/styles";
 
 // Define custom MUI theme

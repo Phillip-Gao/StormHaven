@@ -10,9 +10,13 @@ App.js: Sets up the routing for the app, defining which components should be dis
 
 Dashboard.js: Displays an overview of relevant disaster and housing information. 
 
-DisasterRisks.js: Displays a list of disaster events and affected properties. Users can search based on disaster type, date, and location.
+FindHouses.js: Allows users to filter properties based on criteria such as property id, city, state, price, number of bedrooms/bathrooms, and acre size. Users can click the property id for more detailed information about the house PropertyCard.js. Users can also toggle which properties they want to favorite on this page. 
 
-FindHouses.js: Alows users to filter properties based on criteria such as location, price, number of bedrooms/bathrooms, and disaster type.
+DisasterRisks.js: Displays a list of disaster events - users can search based on disaster id, number, type code, city, and designated date. To view disaster trends, users can scroll down to view the number of disasters per type code by year. 
+
+PropertyCard.js: When clicking on property information, this card displays the property id, city, state, price, number of bedrooms/bathrooms, and acre size. Additionally, users can view the history of all disasters that have impacted the house's location. We also list the total number of disasters and the most recent disaster that has impacted the property. 
+
+Favorites.js: On this page, users can view the properties they had favorited on the FindHouses.js page. We have provided a button to allow users to remove properties from this list, and also a resizable notes box for users to add a description of the property (the favorited properties and their notes will be saved when the user reloads the page).
 
 PageNavbar.js: Reusable navigation bar used across different pages. Renders navigation links for each page and highlights the active page.
 
@@ -26,21 +30,9 @@ First, open up a new terminal in the VSCode project. Then run the following to n
 
     cd client
 
-We then run the following (you will notice that you will get errors, which we will resolve in the following steps):
+We then run the following:
 
-    npm install 
-
-Need to install @mui/material @emotion/react @emotion/styled:
-
-    npm install @mui/material @emotion/react @emotion/styled --legacy-peer-deps
-
-Then install @mui/x-data-grid
-    
-    npm install @mui/x-data-grid --legacy-peer-deps
-
-Then install @mui/icons-material
-
-    npm install @mui/icons-material --legacy-peer-deps
+    npm install --legacy-peer-deps
 
 Finally, start the client:
 
@@ -52,7 +44,7 @@ Next, open up a separate terminal in the VSCode project. Then run the following 
 
     cd server
 
-We then run the following (there should be no errors):
+We then run the following:
 
     npm install
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Container, Typography, Button, TextField } from '@mui/material';
+import { Container, Button, TextField } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import PageNavbar from './PageNavbar';
 import config from './config.json';
@@ -70,20 +70,6 @@ export default function Favorites() {
   const handleRemove = (id) => {
     removeFavorite(id);
     setData(data.filter(property => property.id !== id));
-  };
-
-  /**
-   * Adds or updates a note for a property.
-   * Updates local state and persists changes to localStorage.
-   * @param {string} id - Property ID
-   * @param {string} note - Note content to add or update
-   */
-  const handleAddNote = (id, note) => {
-    const updatedData = data.map(property => 
-      property.id === id ? { ...property, note } : property
-    );
-    setData(updatedData);
-    localStorage.setItem('favorites', JSON.stringify(updatedData));
   };
 
   // Update note for a property and persist it in state and localStorage

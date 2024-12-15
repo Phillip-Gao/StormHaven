@@ -88,12 +88,6 @@ export default function DisasterRisks() {
   const handleTypeCodeChange = (event) => {
     setTypeCode(event.target.value);
   };
-
-  // Finds the code corresponding to a type description
-  function getCodeByDescription(description) {
-    const type = typeCodes.find(type => type.description === description);
-    return type ? type.code : 'Description not found';
-  }
   
   // Resets all filter inputs to default values
   const resetFilters = () => {

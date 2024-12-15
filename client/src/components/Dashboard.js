@@ -5,7 +5,7 @@
  * with real-time data fetched from backend APIs and displayed in tables and grids.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Container } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import '../style/Dashboard.css';
@@ -14,13 +14,6 @@ import PageNavbar from './PageNavbar';
 import config from './config.json';
 
 export default function Dashboard(props) {
-	const [pageSize, setPageSize] = useState(10);
-
-    // States for managing overview data and its loading/error status
-    const [overviewDisasters, setOverviewDisasters] = useState([]);
-    const [isLoadingOverview, setIsLoadingOverview] = useState(false);
-    const [hasErrorOverview, setHasErrorOverview] = useState(false);
-
      // States for managing analytics data and its loading/error status
     const [analyticsDisasters, setAnalyticsDisasters] = useState([]);
     const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(false);
@@ -36,13 +29,10 @@ export default function Dashboard(props) {
     // States for storing analytics datasets
 	const [safestProperties, setSafestProperties] = useState([]);
 	const [propertiesWithSignificantDisasters, setPropertiesWithSignificantDisasters] = useState([]);
-    const [isLoadingSafestProperties, setIsLoadingSafestProperties] = useState(false);
-    const [hasErrorSafestProperties, setHasErrorSafestProperties] = useState(false);
 
     // State to toggle visibility for overview and analytics sections
     const [showOverview, setShowOverview] = useState([false, false, false]);
     const [showAnalytics, setShowAnalytics] = useState([false, false, false]);
-
 
      // Fetches data for the Overview section based on the selected button index.
      // Handles the toggle logic for showing/hiding data and updates the corresponding state.
@@ -278,7 +268,7 @@ export default function Dashboard(props) {
 						onClick={() => fetchAnalyticsData(2)}
 						style={{ marginBottom: '10px' }}
 					>
-						Prices for properties commonly affected by disasters
+						Prices for Properties Commonly Affected by Disasters
 					</button>
 				</div>
 				{isLoadingAnalytics ? (
