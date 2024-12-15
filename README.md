@@ -51,3 +51,7 @@ We then run the following:
 Finally, start the server:
 
     npm start
+
+### View Website
+
+Now, navigate to http://localhost:3000/ in your web browser to see our website!
