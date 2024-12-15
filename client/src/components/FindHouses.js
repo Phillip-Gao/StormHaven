@@ -13,7 +13,7 @@ export default function FindHouses() {
   const [data, setData] = useState([]);
   const [selectedPropertyId, setSelectedPropertyId] = useState(null);
  
-  // Filters
+  // Filters for search
   const [propertyId, setPropertyId] = useState('');
   const [countyName, setCountyName] = useState('');
   const [state, setState] = useState(''); 
