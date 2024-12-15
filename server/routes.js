@@ -1,3 +1,10 @@
+/**
+ * This file defines various route handlers for querying disaster-related 
+ * and property-related data from a PostgreSQL database. The queries are designed 
+ * to support analytics and dashboard functionalities, such as retrieving information 
+ * about disasters, properties, and their intersections.
+ */
+
 const config = require('./config.json')
 var mysql = require('mysql');
 const { Pool, types } = require('pg');

@@ -1,3 +1,10 @@
+/**
+ * This React component renders the dashboard for the StormHaven application, 
+ * providing an interactive interface to view and analyze disaster-related data 
+ * and property insights. It includes sections for an overview and analytics, 
+ * with real-time data fetched from backend APIs and displayed in tables and grids.
+ */
+
 import React, { useState, useEffect } from 'react';
 import { Container } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
@@ -8,28 +15,38 @@ import config from './config.json';
 
 export default function Dashboard(props) {
 	const [pageSize, setPageSize] = useState(10);
+
+    // States for managing overview data and its loading/error status
     const [overviewDisasters, setOverviewDisasters] = useState([]);
     const [isLoadingOverview, setIsLoadingOverview] = useState(false);
     const [hasErrorOverview, setHasErrorOverview] = useState(false);
 
+     // States for managing analytics data and its loading/error status
     const [analyticsDisasters, setAnalyticsDisasters] = useState([]);
     const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(false);
     const [hasErrorAnalytics, setHasErrorAnalytics] = useState(false);
 
+    // States for storing various overview datasets
     const [mostAffectedLocations, setMostAffectedLocations] = useState([]);
     const [affectedPropertiesPastTwoYears, setAffectedPropertiesPastTwoYears] = useState([]);
     const [propertiesNoDisasterHighRisk, setPropertiesNoDisasterHighRisk] = useState([]);
     const [isLoadingMostAffected, setIsLoadingMostAffected] = useState(false);
     const [hasErrorMostAffected, setHasErrorMostAffected] = useState(false);
 
+    // States for storing analytics datasets
 	const [safestProperties, setSafestProperties] = useState([]);
 	const [propertiesWithSignificantDisasters, setPropertiesWithSignificantDisasters] = useState([]);
     const [isLoadingSafestProperties, setIsLoadingSafestProperties] = useState(false);
     const [hasErrorSafestProperties, setHasErrorSafestProperties] = useState(false);
 
+    // State to toggle visibility for overview and analytics sections
     const [showOverview, setShowOverview] = useState([false, false, false]);
     const [showAnalytics, setShowAnalytics] = useState([false, false, false]);
 
+
+     // Fetches data for the Overview section based on the selected button index.
+     // Handles the toggle logic for showing/hiding data and updates the corresponding state.
+    
     const fetchOverviewData = (index) => {
         // Reset all other button states except the clicked one
         const updatedShowOverview = showOverview.map((_, i) => i === index);
@@ -85,6 +102,11 @@ export default function Dashboard(props) {
             });
     };
 
+
+    /**
+     * Fetches data for the Analytics section based on the selected button index.
+     * Handles the toggle logic for showing/hiding data and updates the corresponding state.
+     */
 	const fetchAnalyticsData = (index) => {
 		// Reset all analytics states except the clicked one
 		const updatedShowAnalytics = [false, false, false];
@@ -137,6 +159,7 @@ export default function Dashboard(props) {
             });
 	};
 
+    // The main UI structure of the Dashboard component
     return (
         <Container>
             <PageNavbar active="Dashboard" />

@@ -1,3 +1,5 @@
+// Component for searching and analyzing disaster data and trends.
+
 import React, { useState, useEffect } from 'react';
 import {
   Button,
