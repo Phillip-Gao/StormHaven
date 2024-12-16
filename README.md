@@ -20,7 +20,13 @@ Favorites.js: On this page, users can view the properties they had favorited on 
 
 PageNavbar.js: Reusable navigation bar used across different pages. Renders navigation links for each page and highlights the active page.
 
-## Instructions
+## Deployment
+
+StormHaven is live and accessible at this link: https://stormhaven.vercel.app
+
+The frontend (client) is deployed on Vercel. The backend (server) is deployed on Render. Please note that the Render instance spins down with inactivity, so please give the website up to 2 minutes to load the query requests. 
+
+## Running Locally
 
 The node modules required for the client and the server are not downloaded (files are too large to be stored on GitHub). To ensure they work, we must go through the following process:
 
